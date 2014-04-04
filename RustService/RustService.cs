@@ -6,6 +6,7 @@ using System.ServiceModel;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Rust {
     public class RustService : IRustService {
@@ -81,7 +82,7 @@ namespace Rust {
             }
         }
 
-        public void InstallRustServer() {
+        public async void InstallRustServer() {
             string steamPath = cfg.SteamPath;
             string installPath = cfg.InstallPath;
             Logger.Log(String.Format("Starting new Customer installation for {0}", Identifier));
@@ -93,21 +94,24 @@ namespace Rust {
                 if (!File.Exists(String.Format(@"{0}\scripts\{1}.txt", cfg.AppPath, Identifier)))
                     CreateSteamScript();
 
-                Process steam = new Process();
-                steam.StartInfo.FileName = String.Format(@"{0}\steamcmd.exe", cfg.SteamPath);
-                steam.StartInfo.UseShellExecute = false;
-                steam.StartInfo.Arguments = String.Format(@"+runscript {0}\scripts\{1}.txt", 
-                    cfg.AppPath, Identifier);
-                steam.StartInfo.RedirectStandardOutput = true;
-                steam.StartInfo.RedirectStandardError = true;
-                steam.Start();
-                Logger.Log(String.Format(@"Installing Rust to {0}\{1} -- please wait...", installPath, Identifier));
+                Task task = RunSteamAsync(cfg, Identifier);
+                await task;
 
-                string output = steam.StandardOutput.ReadToEnd();
-                string error = steam.StandardError.ReadToEnd();
-                Logger.Log(error);
-                Logger.Log(output);
-                steam.WaitForExit();
+                //Process steam = new Process();
+                //steam.StartInfo.FileName = String.Format(@"{0}\steamcmd.exe", cfg.SteamPath);
+                //steam.StartInfo.UseShellExecute = false;
+                //steam.StartInfo.Arguments = String.Format(@"+runscript {0}\scripts\{1}.txt", 
+                //    cfg.AppPath, Identifier);
+                //steam.StartInfo.RedirectStandardOutput = true;
+                //steam.StartInfo.RedirectStandardError = true;
+                //steam.Start();
+                //Logger.Log(String.Format(@"Installing Rust to {0}\{1} -- please wait...", installPath, Identifier));
+
+                //string output = steam.StandardOutput.ReadToEnd();
+                //string error = steam.StandardError.ReadToEnd();
+                //Logger.Log(error);
+                //Logger.Log(output);
+                //steam.WaitForExit();
 
                 if (File.Exists(String.Format(@"{0}\{1}\rust_server.exe", installPath, Identifier)))
                 {
@@ -129,6 +133,36 @@ namespace Rust {
             {
                 Console.WriteLine(e.Message);
             }
+        }
+
+        static Task RunSteamAsync(Config cfg, string ident) {
+            // there is no non-generic TaskCompletionSource
+            var tcs = new TaskCompletionSource<bool>();
+
+
+            Process steam = new Process();
+            steam.StartInfo.FileName = String.Format(@"{0}\steamcmd.exe", cfg.SteamPath);
+            steam.StartInfo.UseShellExecute = false;
+            steam.StartInfo.Arguments = String.Format(@"+runscript {0}\scripts\{1}.txt",
+                cfg.AppPath, ident);
+            steam.StartInfo.RedirectStandardOutput = true;
+            steam.StartInfo.RedirectStandardError = true;
+            //steam.Start();
+
+            //steam.WaitForExit();
+
+            steam.Exited += (sender, args) => {
+                tcs.SetResult(true);
+                steam.Dispose();
+            };
+
+            steam.Start();
+            string output = steam.StandardOutput.ReadToEnd();
+            string error = steam.StandardError.ReadToEnd();
+            Logger.Log(error);
+            Logger.Log(output);
+            //steam.WaitForExit();
+            return tcs.Task;
         }
 
         static string GeneratePassword() {
