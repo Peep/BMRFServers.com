@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPNHandler", "IPNHandler\IPNHandler.csproj", "{458ECA11-2C3F-4613-91BD-84AAA8F62484}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RustService", "RustService\RustService.csproj", "{FD309E59-ADE8-472F-B35D-1EF2836BC510}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RustServiceHost", "RustServiceHost\RustServiceHost.csproj", "{B19B0078-B6CE-4905-84E3-900D0A0BD094}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{458ECA11-2C3F-4613-91BD-84AAA8F62484}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{458ECA11-2C3F-4613-91BD-84AAA8F62484}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{458ECA11-2C3F-4613-91BD-84AAA8F62484}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{458ECA11-2C3F-4613-91BD-84AAA8F62484}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD309E59-ADE8-472F-B35D-1EF2836BC510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD309E59-ADE8-472F-B35D-1EF2836BC510}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD309E59-ADE8-472F-B35D-1EF2836BC510}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD309E59-ADE8-472F-B35D-1EF2836BC510}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B19B0078-B6CE-4905-84E3-900D0A0BD094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B19B0078-B6CE-4905-84E3-900D0A0BD094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B19B0078-B6CE-4905-84E3-900D0A0BD094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B19B0078-B6CE-4905-84E3-900D0A0BD094}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
