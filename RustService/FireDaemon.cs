@@ -8,26 +8,37 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.ServiceProcess;
 
-namespace Rust {
-    public class FireDaemon {
+namespace Rust 
+{
+    public class FireDaemon 
+    {
         Config cfg;
         string ident;
         int slots;
         int port;
 
-        public FireDaemon(Config config, string identifier, int slots) {
+        public FireDaemon(Config config, string identifier, int slots) 
+        {
             this.cfg = config;
             this.ident = identifier;
             this.slots = slots;
         }
 
-        public void WriteXml(XDocument xml, string filename) {
-            try {
+        public void WriteXml(XDocument xml, string filename) 
+        {
+            try 
+            {
                 if (!Directory.Exists(String.Format(@"{0}\xml", cfg.AppPath)))
+                {
                     Directory.CreateDirectory(String.Format(@"{0}\xml", cfg.AppPath));
+                }
+
                 xml.Save(String.Format(@"{0}\xml\{1}.xml", cfg.AppPath, filename));
                 InstallService();
-            } catch (Exception e) {
+
+            } 
+            catch (Exception e) 
+            {
                 DeploymentResults.ExceptionThrown = true;
                 DeploymentResults.Exceptions.Add(e);
             }
@@ -35,60 +46,88 @@ namespace Rust {
 
         // I really don't like this method of deciding whether a port is valid,
         // should probably come up with something different in the future.
-        public int GetValidPort() {
-            try {
+        public int GetValidPort() 
+        {
+            try 
+            {
                 bool validPort = false;
                 int port = 28015;
 
                 if (!File.Exists(String.Format(@"{0}\ports.cfg", cfg.AppPath)))
+                {
                     File.Create(String.Format(@"{0}\ports.cfg", cfg.AppPath));
+                }
+
                 List<string> parseFile = File.ReadLines(String.Format(@"{0}\ports.cfg", cfg.AppPath)).ToList();
                 var ports = parseFile.Select(int.Parse).ToList();
 
-                while (!validPort) {
+                while (!validPort) 
+                {
                     if (ports.Contains(port))
+                    {
                         port += 5;
+                    }
                     else
+                    {
                         validPort = true;
+                    }
                 }
+
                 this.port = port;
-            } catch (Exception e) {
+
+            } 
+            catch (Exception e) 
+            {
                 DeploymentResults.ExceptionThrown = true;
                 DeploymentResults.Exceptions.Add(e);
             }
+
             return this.port;
         }
 
-        public void InstallService() {
-            try {
+        public void InstallService() 
+        {
+            try 
+            {
                 Logger.Log("Installing FireDaemon Service");
                 Console.WriteLine("Installing FireDaemon Service");
+
                 Process fd = new Process();
+
                 fd.StartInfo.FileName = String.Format(@"{0}\FireDaemon.exe", cfg.FDPath);
                 fd.StartInfo.UseShellExecute = false;
                 fd.StartInfo.Arguments = String.Format(@"--import-all {0}\xml\*.xml", cfg.AppPath);
+
                 fd.StartInfo.RedirectStandardOutput = true;
                 fd.StartInfo.RedirectStandardError = true;
+
                 fd.Start();
 
                 string output = fd.StandardOutput.ReadToEnd();
                 string error = fd.StandardError.ReadToEnd();
+
                 Logger.Log(error);
                 Logger.Log(output);
 
                 fd.WaitForExit();
-            } catch (Exception e) {
+            } 
+            catch (Exception e) 
+            {
                 Logger.Log(e.ToString());
             }
 
             ServiceController ctl = ServiceController.GetServices()
                 .FirstOrDefault(s => s.ServiceName == String.Format("Rust - {0}", ident));
-            if (ctl == null) {
+
+            if (ctl == null) 
+            {
                 Logger.Log("FireDaemon Service installation failed!");
-            } else {
+            } else 
+            {
                 Logger.Log(String.Format("{0}'s Rust Server is {1}", ident, ctl.Status));
                 using (StreamWriter writer = new StreamWriter(String.Format(@"{0}\ports.cfg", cfg.AppPath), true))
                     writer.WriteLine(port);
+
                 Directory.Delete(String.Format(@"{0}\xml", cfg.AppPath), true);
                 DeploymentResults.Port = port;
             }
@@ -252,6 +291,7 @@ namespace Rust {
                     )
                 )
             );
+
             WriteXml(service, ident);
             WriteXml(updater, String.Format("{0}-update", ident));
         }

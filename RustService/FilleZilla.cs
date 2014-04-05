@@ -7,34 +7,42 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Diagnostics;
 
-namespace Rust {
-    public class FileZilla {
+namespace Rust 
+{
+    public class FileZilla 
+    {
         Config cfg;
         string ident;
         int slots;
         string pass;
 
-        public FileZilla(Config config, string identifier, int slots, string pass) {
+        public FileZilla(Config config, string identifier, int slots, string pass) 
+        {
             this.cfg = config;
             this.ident = identifier;
             this.slots = slots;
             this.pass = pass;
         }
 
-        public void GenerateXml() {
-            try {
+        public void GenerateXml() 
+        {
+            try 
+            {
                 bool userExists = false;
 
                 XDocument xDoc = XDocument.Load(String.Format(@"{0}\FileZilla Server.xml", cfg.FileZillaPath));
 
-                foreach (var item in xDoc.Descendants("User")) {
-                    if (item.Attribute("Name").Value == ident) {
+                foreach (var item in xDoc.Descendants("User")) 
+                {
+                    if (item.Attribute("Name").Value == ident) 
+                    {
                         Logger.Log("User already exists in FileZilla, so it won't be created.");
                         userExists = true;
                     }
                 }
 
-                if (!userExists) {
+                if (!userExists) 
+                {
                     Console.WriteLine("Creating FTP user");
 
                     XElement user =
@@ -232,26 +240,32 @@ namespace Rust {
                     Logger.Log("FileZilla config reloaded!");
                 }
             }
-            catch (Exception e) {
+            catch (Exception e) 
+            {
                 DeploymentResults.ExceptionThrown = true;
                 DeploymentResults.Exceptions.Add(e);
             }
         }
 
-        static string GetMd5(string pass) {
+        static string GetMd5(string pass) 
+        {
             byte[] hash;
-            using (MD5 md5 = MD5.Create()) {
+            using (MD5 md5 = MD5.Create()) 
+            {
                 hash = md5.ComputeHash(Encoding.UTF8.GetBytes(pass));
             }
             var md5Pass = ToHex(hash, false);
             return md5Pass;
         }
 
-        public static string ToHex(byte[] bytes, bool upperCase) {
+        public static string ToHex(byte[] bytes, bool upperCase) 
+        {
             StringBuilder result = new StringBuilder(bytes.Length * 2);
 
             for (int i = 0; i < bytes.Length; i++)
+            {
                 result.Append(bytes[i].ToString(upperCase ? "X2" : "x2"));
+            }
 
             return result.ToString();
         }

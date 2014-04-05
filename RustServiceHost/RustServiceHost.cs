@@ -15,18 +15,23 @@ using System.ServiceModel.Security;
 using System.Timers;
 using System.IO;
 
-namespace RustServiceHost {
-    public partial class RustServiceHost : ServiceBase {
+namespace RustServiceHost 
+{
+    public partial class RustServiceHost : ServiceBase 
+    {
         Uri baseAddress = new Uri("https://bmrfservers.com:8000/TestService");
         ServiceHost serviceHost;
         WSHttpBinding binding = new WSHttpBinding();
 
-        public RustServiceHost() {
+        public RustServiceHost() 
+        {
             InitializeComponent();
         }
 
-        protected override void OnStart(string[] args) {
-            try {
+        protected override void OnStart(string[] args) 
+        {
+            try 
+            {
                 binding.Security.Mode = SecurityMode.Transport;
                 serviceHost = new ServiceHost(typeof(RustService), baseAddress);
 
@@ -40,12 +45,15 @@ namespace RustServiceHost {
                 ServiceDebugBehavior debug = serviceHost.Description.Behaviors.Find<ServiceDebugBehavior>();
 
                 // if not found - add behavior with setting turned on 
-                if (debug == null) {
+                if (debug == null) 
+                {
                     serviceHost.Description.Behaviors.Add(
                          new ServiceDebugBehavior() { IncludeExceptionDetailInFaults = true });
-                } else {
+                } else 
+                {
                     // make sure setting is turned ON
-                    if (!debug.IncludeExceptionDetailInFaults) {
+                    if (!debug.IncludeExceptionDetailInFaults) 
+                    {
                         debug.IncludeExceptionDetailInFaults = true;
                     }
                 }
@@ -55,14 +63,19 @@ namespace RustServiceHost {
                 serviceHost.Description.Behaviors.Add(smb);
 
                 serviceHost.Open();
-            } catch (Exception e) {
-                using (var writer = new StreamWriter("C:\\ServiceErrorLog")) {
+
+            } 
+            catch (Exception e) 
+            {
+                using (var writer = new StreamWriter("C:\\ServiceErrorLog")) 
+                {
                     writer.WriteLine(e.ToString());
                 }
             }
         }
 
-        protected override void OnStop() {
+        protected override void OnStop() 
+        {
             serviceHost.Close();
         }
     }

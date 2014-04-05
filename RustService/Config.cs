@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using EasyConfigLib.Storage;
 
-namespace Rust {
-    public class Config : EasyConfig {
+namespace Rust 
+{
+    public class Config : EasyConfig 
+    {
         [Field("SteamCMD Path", "AppSettings")]
         public string SteamPath = @"D:\Development\SteamCMD";
         [Field("Application Directory")]
