@@ -233,7 +233,8 @@ namespace Rust {
                 }
             }
             catch (Exception e) {
-                Logger.Log(e.ToString());
+                DeploymentResults.ExceptionThrown = true;
+                DeploymentResults.Exceptions.Add(e);
             }
         }
 

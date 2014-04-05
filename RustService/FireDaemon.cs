@@ -22,29 +22,41 @@ namespace Rust {
         }
 
         public void WriteXml(XDocument xml, string filename) {
-            if (!Directory.Exists(String.Format(@"{0}\xml", cfg.AppPath)))
-                Directory.CreateDirectory(String.Format(@"{0}\xml", cfg.AppPath));
-            xml.Save(String.Format(@"{0}\xml\{1}.xml", cfg.AppPath, filename));
-            InstallService();
+            try {
+                if (!Directory.Exists(String.Format(@"{0}\xml", cfg.AppPath)))
+                    Directory.CreateDirectory(String.Format(@"{0}\xml", cfg.AppPath));
+                xml.Save(String.Format(@"{0}\xml\{1}.xml", cfg.AppPath, filename));
+                InstallService();
+            } catch (Exception e) {
+                DeploymentResults.ExceptionThrown = true;
+                DeploymentResults.Exceptions.Add(e);
+            }
         }
 
+        // I really don't like this method of deciding whether a port is valid,
+        // should probably come up with something different in the future.
         public int GetValidPort() {
-            bool validPort = false;
-            int port = 28015;
+            try {
+                bool validPort = false;
+                int port = 28015;
 
-            if (!File.Exists(String.Format(@"{0}\ports.cfg", cfg.AppPath)))
-                File.Create(String.Format(@"{0}\ports.cfg", cfg.AppPath));
-            List<string> parseFile = File.ReadLines(String.Format(@"{0}\ports.cfg", cfg.AppPath)).ToList();
-            var ports = parseFile.Select(int.Parse).ToList();
+                if (!File.Exists(String.Format(@"{0}\ports.cfg", cfg.AppPath)))
+                    File.Create(String.Format(@"{0}\ports.cfg", cfg.AppPath));
+                List<string> parseFile = File.ReadLines(String.Format(@"{0}\ports.cfg", cfg.AppPath)).ToList();
+                var ports = parseFile.Select(int.Parse).ToList();
 
-            while (!validPort) {
-                if (ports.Contains(port))
-                    port += 5;
-                else
-                    validPort = true;
+                while (!validPort) {
+                    if (ports.Contains(port))
+                        port += 5;
+                    else
+                        validPort = true;
+                }
+                this.port = port;
+            } catch (Exception e) {
+                DeploymentResults.ExceptionThrown = true;
+                DeploymentResults.Exceptions.Add(e);
             }
-            this.port = port;
-            return port;
+            return this.port;
         }
 
         public void InstallService() {
@@ -78,6 +90,7 @@ namespace Rust {
                 using (StreamWriter writer = new StreamWriter(String.Format(@"{0}\ports.cfg", cfg.AppPath), true))
                     writer.WriteLine(port);
                 Directory.Delete(String.Format(@"{0}\xml", cfg.AppPath), true);
+                DeploymentResults.Port = port;
             }
         }
 
