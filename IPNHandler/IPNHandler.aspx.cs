@@ -13,6 +13,7 @@ using System.Collections.Specialized;
 using MySql.Data.MySqlClient;
 using System.Text.RegularExpressions;
 using System.Net.Mail;
+using IPN.RustServiceReference;
 #endregion
 
 namespace IPN {
@@ -25,6 +26,8 @@ namespace IPN {
             req.Method = "POST";
             req.ContentType = "application/x-www-form-urlencoded";
             byte[] param = Request.BinaryRead(HttpContext.Current.Request.ContentLength);
+
+            //TestClient();
 
             string request = Encoding.ASCII.GetString(param);
 
@@ -48,8 +51,13 @@ namespace IPN {
             if (response == "VERIFIED") {
                 //check that txn_id has not been previously processed
                 //check that payment_amount/payment_currency are correct
-                if (paymentArgs["receiver_email"] == "admin@bmrf.me" && paymentArgs["payment_status"] == "Confirmed") {
-                    ProcessPayment(paymentArgs); // Payment is valid, process
+                if (paymentArgs["txn_type"] == "subscr_payment") {
+                    if (paymentArgs["receiver_email"] == "admin@bmrf.me" && paymentArgs["payment_status"] == "Confirmed")
+                        ProcessPayment(paymentArgs);
+                    else if (paymentArgs["txn_type"] == "subscr_signup") {
+                        ProcessPayment(paymentArgs);
+                        // install Rust server
+                    }
                 } else {
                     Log(String.Format("Payment receiver_email and payment_status were unexpected, payment string: {0}", request));
                     SendEmail("IPN Handler: Payment Error",
@@ -63,6 +71,15 @@ namespace IPN {
                 //log response/ipn data for manual investigation
             }
         }
+
+        //void TestClient() {
+        //    Dictionary<string, object> dic = new Dictionary<string, object>();
+        //    var client = new RustServiceClient();
+        //    client.ClientCredentials.UserName.UserName = "test";
+        //    client.ClientCredentials.UserName.Password = "test123";
+        //    dic = client.DeployRustServer("GayNerd", 128);
+        //    Log(dic.ToString());
+        //}
 
         public void ProcessPayment(NameValueCollection paymentArgs) {
             try {
@@ -133,7 +150,7 @@ namespace IPN {
         }
 
         void Log(string content, bool datePrefix = true) {
-            string logFile = String.Format("C:\\sites\\bmrfservers.com\\ipntest\\debug.log");
+            string logFile = String.Format("C:\\sites\\rogovo.zombies.nu\\debug.log");
             if (datePrefix)
                 File.AppendAllText(logFile, DateTime.Now + ": " + content + Environment.NewLine);
             else if (!datePrefix)

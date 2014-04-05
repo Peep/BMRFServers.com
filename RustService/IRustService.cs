@@ -13,7 +13,7 @@ namespace Rust {
         [OperationContract]
         CompositeType GetDataUsingDataContract(CompositeType composite);
         [OperationContract]
-        DeploymentResults DeployRustServer(string identifier, int slots);
+        Dictionary<string, object> DeployRustServer(string identifier, int slots);
     }
 
     // Use a data contract as illustrated in the sample below to add composite types to service operations.

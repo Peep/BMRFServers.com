@@ -53,9 +53,6 @@ namespace Rust {
             FileZilla ftpUser = new FileZilla(cfg, Identifier, slots, password);
             ftpUser.GenerateXml();
 
-            if (DeploymentResults.ExceptionThrown == null)
-                DeploymentResults.ExceptionThrown = false;
-
             var dic = new Dictionary<string, object>();
             dic.Add("Port", DeploymentResults.Port);
             dic.Add("Password", password);

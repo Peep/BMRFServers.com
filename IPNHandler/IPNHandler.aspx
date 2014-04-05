@@ -9,7 +9,9 @@
 <body>
     <form id="form1" runat="server">
     <div>
-    
+    <span id="span" runat="server"></span>
+
+    <asp:Literal id="literal" runat="server"></asp:Literal>
     </div>
     </form>
 </body>

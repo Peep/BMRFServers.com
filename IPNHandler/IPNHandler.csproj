@@ -42,6 +42,8 @@
     <Reference Include="MySql.Data">
       <HintPath>..\..\BMRFServers\IPN\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -69,7 +71,28 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="IPNHandler.aspx" />
+    <Content Include="Properties\DataSources\Rust.CompositeType.datasource" />
+    <None Include="Service References\RustServiceReference\RustService.wsdl" />
+    <None Include="Service References\RustServiceReference\TestService.disco" />
+    <None Include="Service References\RustServiceReference\configuration91.svcinfo" />
+    <None Include="Service References\RustServiceReference\configuration.svcinfo" />
+    <None Include="Service References\RustServiceReference\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="Web.config" />
+    <None Include="Service References\RustServiceReference\TestService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RustServiceReference\TestService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RustServiceReference\TestService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RustServiceReference\TestService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IPNHandler.aspx.cs">
@@ -80,6 +103,23 @@
       <DependentUpon>IPNHandler.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service References\RustServiceReference\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RustService\RustService.csproj">
+      <Project>{fd309e59-ade8-472f-b35d-1ef2836bc510}</Project>
+      <Name>RustService</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\RustServiceReference\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
