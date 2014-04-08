@@ -36,20 +36,15 @@ namespace Rust
 
         public void InitializeConfigurationFile() 
         {
-            try 
-            {
-                string configDir = "C:\\servertools\\RustDeployService";
+            string configDir = "C:\\servertools\\RustDeployService";
 
-                if (!Directory.Exists(configDir))
-                {
-                    Directory.CreateDirectory(configDir);
-                }
-                cfg = new Config(configDir + "\\Settings.cfg");
-            } 
-            catch (Exception e) 
+            if (!Directory.Exists(configDir))
             {
-                DeploymentResults.ExceptionThrown = true;
-                DeploymentResults.Exceptions.Add(e);
+                Directory.CreateDirectory(configDir);
+            }
+            if (cfg == null)
+            {
+                cfg = new Config(configDir + "\\Settings.cfg");
             }
         }
 
@@ -125,7 +120,7 @@ namespace Rust
                 .Select(s => s[random.Next(s.Length)])
                 .ToArray());
 
-                using (StreamWriter cfgWriter = new StreamWriter(String.Format(@"{0}\{1}\server.cfg", cfg.InstallPath, Identifier))) 
+                using (StreamWriter cfgWriter = new StreamWriter(String.Format(@"{0}\{1}\save\myserverdata\cfg\server.cfg", cfg.InstallPath, Identifier))) 
                 {
                     cfgWriter.WriteLine(String.Format(@"server.hostname ""{0}'s BMRFServers.com Rust Server""", Identifier));
                     cfgWriter.WriteLine(String.Format(@"rcon.password ""{0}""", rconPass));
@@ -211,6 +206,8 @@ namespace Rust
 
         public Results RunSteamUpdate(string ident)
         {
+            InitializeConfigurationFile();
+
             if (!File.Exists(String.Format(@"{0}\scripts\{1}.txt", cfg.InstallPath, ident)))
             {
                 CreateSteamScript(ident);
@@ -232,11 +229,11 @@ namespace Rust
             steam.StartInfo.UseShellExecute = false;
 
             steam.StartInfo.Arguments = String.Format(@"+runscript {0}\scripts\{1}.txt",
-                cfg.AppPath, Identifier);
+                cfg.AppPath, ident);
 
             steam.Start();
 
-            steam.WaitForExit();
+            steam.WaitForExit(180000);
 
             StartServer(ident);
 
@@ -249,6 +246,8 @@ namespace Rust
 
         public Results InstallMagma(string ident)
         {
+            InitializeConfigurationFile();
+
             if (!Directory.Exists(String.Format(@"{0}\{1}\rust_server_Data", cfg.InstallPath, ident)))
             {
                 return new Results
@@ -258,7 +257,7 @@ namespace Rust
                 };
             }
 
-            if (!Directory.Exists(String.Format(@"{0}\magma\rust_server_Data")))
+            if (!Directory.Exists(String.Format(@"{0}\magma\rust_server_Data", cfg.AppPath)))
             {
                 return new Results
                 {
@@ -269,8 +268,14 @@ namespace Rust
 
             try
             {
-                MoveDirectory(String.Format(@"{0}\magma\rust_server_Data", cfg.AppPath),
+                StartServer(ident);
+
+                CopyDirectory(String.Format(@"{0}\magma\rust_server_Data", cfg.AppPath),
                               String.Format(@"{0}\{1}\rust_server_Data", cfg.InstallPath, ident));
+
+                CopyDirectory(String.Format(@"{0}\magma\save", cfg.AppPath),
+                              String.Format(@"{0}\{1}\save", cfg.InstallPath, ident));
+
                 return new Results
                 {
                     Success = true,
@@ -289,6 +294,8 @@ namespace Rust
 
         public Results IsMagmaInstalled(string ident)
         {
+            InitializeConfigurationFile();
+
             if (File.Exists(String.Format(@"{0}\{1}\rust_server_Data\Managed\Jint.dll", cfg.InstallPath, ident)))
                 if (File.Exists(String.Format(@"{0}\{1}\rust_server_Data\Managed\Magma.dll", cfg.InstallPath, ident)))
                     if (File.Exists(String.Format(@"{0}\{1}\rust_server_Data\Managed\Mono.Cecil.dll", cfg.InstallPath, ident)))
@@ -303,14 +310,18 @@ namespace Rust
             return new Results
             {
                 Success = false,
-                Message = "One or more core Magma files were missing on {0}'s server."
+                Message = String.Format("One or more core Magma files were missing on {0}'s server.", ident)
             };
         }
 
         public Results UninstallMagma(string ident)
         {
+            InitializeConfigurationFile();
+
             try
             {
+                StopServer(ident);
+
                 File.Copy(String.Format(@"{0}\premagma\rust_server_Data\managed\Assembly-CSharp.dll", cfg.AppPath),
                           String.Format(@"{0}\{1}\rust_server_Data\Managed\Assembly-CSharp.dll", cfg.InstallPath, ident), true);
 
@@ -510,7 +521,7 @@ namespace Rust
             return pass;
         }
 
-        public static void MoveDirectory(string source, string target)
+        public static void CopyDirectory(string source, string target)
         {
             var stack = new Stack<Folders>();
             stack.Push(new Folders(source, target));
@@ -523,7 +534,7 @@ namespace Rust
                 {
                     string targetFile = Path.Combine(folders.Target, Path.GetFileName(file));
                     if (File.Exists(targetFile)) File.Delete(targetFile);
-                    File.Move(file, targetFile);
+                    File.Copy(file, targetFile);
                 }
 
                 foreach (var folder in Directory.GetDirectories(folders.Source))
@@ -531,7 +542,7 @@ namespace Rust
                     stack.Push(new Folders(folder, Path.Combine(folders.Target, Path.GetFileName(folder))));
                 }
             }
-            Directory.Delete(source, true);
+            //Directory.Delete(source, true);
         }
     }
 }

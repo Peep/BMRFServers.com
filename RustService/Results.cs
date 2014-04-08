@@ -7,13 +7,13 @@ using System.ServiceModel;
 
 namespace Rust
 {
-    [MessageContract]
+    //[MessageContract]
     public class Results
     {
-        [MessageBodyMember(Order = 1)]
+        //[MessageBodyMember(Order = 1)]
         public bool Success { get; set; }
 
-        [MessageBodyMember(Order = 2)]
+        //[MessageBodyMember(Order = 2)]
         public string Message { get; set; }
     }
 }
