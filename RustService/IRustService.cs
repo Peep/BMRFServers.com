@@ -18,6 +18,27 @@ namespace Rust
 
         [OperationContract]
         Dictionary<string, object> DeployRustServer(string identifier, int slots);
+
+        [OperationContract]
+        Results RunSteamUpdate(string ident);
+
+        [OperationContract]
+        Results InstallMagma(string ident);
+
+        [OperationContract]
+        Results IsMagmaInstalled(string ident);
+
+        [OperationContract]
+        Results UninstallMagma(string ident);
+
+        [OperationContract]
+        Results StartServer(string ident);
+
+        [OperationContract]
+        Results StopServer(string ident);
+
+        [OperationContract]
+        Results RestartServer(string ident);
     }
 
     // Use a data contract as illustrated in the sample below to add composite types to service operations.
