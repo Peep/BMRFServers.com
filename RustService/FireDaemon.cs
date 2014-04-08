@@ -122,7 +122,9 @@ namespace Rust
             if (ctl == null) 
             {
                 Logger.Log("FireDaemon Service installation failed!");
-            } else 
+            } 
+
+            else 
             {
                 Logger.Log(String.Format("{0}'s Rust Server is {1}", ident, ctl.Status));
                 using (StreamWriter writer = new StreamWriter(String.Format(@"{0}\ports.cfg", cfg.AppPath), true))

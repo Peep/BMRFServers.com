@@ -49,7 +49,8 @@ namespace RustServiceHost
                 {
                     serviceHost.Description.Behaviors.Add(
                          new ServiceDebugBehavior() { IncludeExceptionDetailInFaults = true });
-                } else 
+                } 
+                else 
                 {
                     // make sure setting is turned ON
                     if (!debug.IncludeExceptionDetailInFaults) 
