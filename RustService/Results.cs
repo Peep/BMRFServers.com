@@ -8,7 +8,7 @@ using System.ServiceModel;
 namespace Rust
 {
     [MessageContract]
-    class Results
+    public class Results
     {
         [MessageBodyMember(Order = 1)]
         public bool Success { get; set; }
