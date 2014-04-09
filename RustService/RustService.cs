@@ -8,6 +8,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.ServiceProcess;
+using System.Xml.Linq;
 
 namespace Rust 
 {
@@ -107,9 +108,9 @@ namespace Rust
         {
             try 
             {
-                if (!Directory.Exists(String.Format(@"{0}\{1}", cfg.InstallPath, Identifier)))
+                if (!Directory.Exists(String.Format(@"{0}\{1}\save\myserverdata\cfg", cfg.InstallPath, Identifier)))
                 {
-                    Directory.CreateDirectory(String.Format(@"{0}\{1}", cfg.InstallPath, Identifier));
+                    Directory.CreateDirectory(String.Format(@"{0}\{1}\save\myserverdata\cfg", cfg.InstallPath, Identifier));
                 }
 
                 var chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -202,6 +203,44 @@ namespace Rust
                 DeploymentResults.Exceptions.Add(e);
             }
             return success;
+        }
+
+        public Results UninstallRustServer(string ident)
+        {
+            InitializeConfigurationFile();
+
+            if (Directory.Exists(Path.Combine(cfg.InstallPath, ident)))
+            {
+                StopServer(ident);
+                Directory.Delete(Path.Combine(cfg.InstallPath, ident), true);
+
+                XDocument xDoc = XDocument.Load(String.Format(@"{0}\FileZilla Server.xml", cfg.FileZillaPath));
+
+                foreach (var item in xDoc.Descendants("User"))
+                {
+                    if (item.Attribute("Name").Value == ident)
+                    {
+                        item.Attribute("Name").Remove();
+                    }
+                }
+              
+                xDoc.Save(String.Format(@"{0}\FileZilla Server.xml", cfg.FileZillaPath));
+                Process.Start(cfg.FileZillaPath + "\\FileZilla Server.exe", "/reload-config");
+
+                return new Results
+                {
+                    Success = true,
+                    Message = "The specified user was successfully removed from this machine."
+                };
+            }
+            else
+            {
+                return new Results
+                {
+                    Success = false,
+                    Message = "That user was not found on this machine."
+                };
+            }
         }
 
         public Results RunSteamUpdate(string ident)

@@ -39,6 +39,9 @@ namespace Rust
 
         [OperationContract]
         Results RestartServer(string ident);
+
+        [OperationContract]
+        Results UninstallRustServer(string ident);
     }
 
     // Use a data contract as illustrated in the sample below to add composite types to service operations.
