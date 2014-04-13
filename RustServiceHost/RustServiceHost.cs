@@ -21,7 +21,8 @@ namespace RustServiceHost
     {
         Uri baseAddress = new Uri("https://bmrfservers.com:8000/TestService");
         ServiceHost serviceHost;
-        WSHttpBinding binding = new WSHttpBinding();
+        //WSHttpBinding binding = new WSHttpBinding();
+        BasicHttpBinding binding = new BasicHttpBinding();
 
         public RustServiceHost() 
         {
@@ -32,7 +33,7 @@ namespace RustServiceHost
         {
             try 
             {
-                binding.Security.Mode = SecurityMode.Transport;
+                binding.Security.Mode = BasicHttpSecurityMode.Transport;
                 serviceHost = new ServiceHost(typeof(RustService), baseAddress);
 
                 serviceHost.Credentials.UserNameAuthentication.UserNamePasswordValidationMode = UserNamePasswordValidationMode.Custom;

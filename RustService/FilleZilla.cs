@@ -51,7 +51,7 @@ namespace Rust
                         ),
                         new XElement("Option",
                             new XAttribute("Name", "Pass"),
-                            new XText(GetMd5(pass))
+                            new XText(Crypto.GetMd5(pass))
                         ),
                             new XElement("Option",
                             new XAttribute("Name", "Group"),
@@ -245,29 +245,6 @@ namespace Rust
                 DeploymentResults.ExceptionThrown = true;
                 DeploymentResults.Exceptions.Add(e);
             }
-        }
-
-        static string GetMd5(string pass) 
-        {
-            byte[] hash;
-            using (MD5 md5 = MD5.Create()) 
-            {
-                hash = md5.ComputeHash(Encoding.UTF8.GetBytes(pass));
-            }
-            var md5Pass = ToHex(hash, false);
-            return md5Pass;
-        }
-
-        public static string ToHex(byte[] bytes, bool upperCase) 
-        {
-            StringBuilder result = new StringBuilder(bytes.Length * 2);
-
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                result.Append(bytes[i].ToString(upperCase ? "X2" : "x2"));
-            }
-
-            return result.ToString();
         }
     }
 }

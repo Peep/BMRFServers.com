@@ -32,6 +32,15 @@ namespace Rust
         Results UninstallMagma(string ident);
 
         [OperationContract]
+        Results ChangeConfigValue(string ident, string key, string value);
+
+        [OperationContract]
+        Results ChangeFtpPass(string ident, string newPass);
+
+        [OperationContract]
+        Results ToggleCheatpunch(string ident, bool enabled);
+
+        [OperationContract]
         Results StartServer(string ident);
 
         [OperationContract]

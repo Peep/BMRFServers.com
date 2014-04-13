@@ -384,6 +384,118 @@ namespace Rust
             }
         }
 
+        public Results ChangeConfigValue(string ident, string key, string value)
+        {
+            return new Results
+            {
+
+            };
+        }
+
+        public Results ChangeFtpPass(string ident, string newPass)
+        {
+            InitializeConfigurationFile();    
+
+            XDocument xDoc = XDocument.Load(Path.Combine(cfg.FileZillaPath, "FileZilla Server.xml"));
+
+            var password = (from x in xDoc.Descendants("User")
+                            where x.Attribute("Name").Value == ident
+                            select x.Element("Option")).FirstOrDefault();
+
+            if (password != null)
+            {
+                password.SetValue(Crypto.GetMd5(newPass));
+
+                xDoc.Save(Path.Combine(cfg.FileZillaPath, "FileZilla Server.xml"));
+                Process.Start(Path.Combine(cfg.FileZillaPath, "FileZilla Server.exe"), "/reload-config");
+
+                return new Results { Success = true, Message = "The password was changed successfully." };
+            }
+            else
+            {
+                return new Results { Success = false, Message = "The specified user was not found on this machine." };
+            }
+        }
+
+        public Results ToggleCheatpunch(string ident, bool enabled)
+        {
+            InitializeConfigurationFile();
+            string serviceName = String.Format("Rust - {0}", ident);
+            string xmlPath = Path.Combine(cfg.AppPath, "export\\export.xml");
+
+            try
+            {
+                if (!Directory.Exists(Path.Combine(cfg.AppPath, "export")))
+                    Directory.CreateDirectory(Path.Combine(cfg.AppPath, "export"));
+
+                if (File.Exists(xmlPath))
+                    File.Delete(xmlPath);
+
+                using (var fd = new Process())
+                {
+                    fd.StartInfo.FileName = Path.Combine(cfg.FDPath, "FireDaemon.exe");
+
+                    fd.StartInfo.Arguments = String.Format(@"--export ""{0}"" {1}",
+                        serviceName, Path.Combine(cfg.AppPath, "export\\export.xml"));
+
+                    fd.Start();
+                    fd.WaitForExit();
+                }
+
+                var lines = File.ReadAllLines(xmlPath);
+                File.WriteAllLines(xmlPath, lines.Skip(2).ToArray());
+
+                if (File.Exists(xmlPath))
+                {
+                    var xDoc = XDocument.Load(xmlPath);
+
+                    var parameters = (from x in xDoc.Descendants("Program")
+                                      where x.Element("Name").Value == serviceName
+                                      select x.Element("Parameters")).FirstOrDefault();
+
+                    if (parameters.Value.Contains("-cheatpunch") && enabled)
+                        return new Results { Success = true, Message = "Cheatpunch is already enabled" };
+
+                    else if (!parameters.Value.Contains("-cheatpunch") && enabled)
+                    {
+                        parameters.SetValue(parameters.Value + " -cheatpunch");
+
+                        xDoc.Save(xmlPath);
+
+                        Process.Start(Path.Combine(cfg.FDPath, "FireDaemon.exe"),
+                            String.Format(@"--install {0} edit", xmlPath));
+
+                        return new Results { Success = true, Message = "Cheatpunch has been enabled." };
+                    }
+                    else if (parameters.Value.Contains("-cheatpunch") && !enabled)
+                    {
+                        parameters.SetValue(parameters.Value.Replace("-cheatpunch", ""));
+
+                        xDoc.Save(xmlPath);
+
+                        Process.Start(Path.Combine(cfg.FDPath, "FireDaemon.exe"),
+                            String.Format(@"--install {0} edit", xmlPath));
+
+                        return new Results { Success = true, Message = "Cheatpunch has been disabled." };
+                    }
+                }
+                else
+                {
+                    return new Results { Success = false, Message = "It never works the first time." };
+                }
+                return new Results { Success = false, Message = "Reached the end without returning." };
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString());
+                return new Results { Success = false, Message = e.ToString() };
+            }
+            finally
+            {
+                File.Delete(xmlPath);
+            }
+        }
+
         public Results StartServer(string ident)
         {
             try
