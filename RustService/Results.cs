@@ -7,28 +7,23 @@ using System.ServiceModel;
 
 namespace Rust
 {
-    //[MessageContract]
-    public class Results
+    public struct Results
     {
-        //[MessageBodyMember(Order = 1)]
         public bool Success { get; set; }
 
-        //[MessageBodyMember(Order = 2)]
         public string Message { get; set; }
     }
 
-    public class CheatpunchResults
+    public struct CheatpunchResults
     {
-        //[MessageBodyMember(Order = 1)]
         public bool Success { get; set; }
 
         public bool Enabled { get; set; }
 
-        //[MessageBodyMember(Order = 2)]
         public string Message { get; set; }
     }
 
-    public class ConfigResults
+    public struct ConfigResults
     {
         public bool Success { get; set; }
 
@@ -44,5 +39,14 @@ namespace Rust
         public string Status { get; set; }
 
         public string Message { get; set; }
+    }
+
+    public struct MagmaResults
+    {
+        public bool Success { get; set; }
+
+        public string Message { get; set; }
+
+        public bool Installed { get; set; }
     }
 }

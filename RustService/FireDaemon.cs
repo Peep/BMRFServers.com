@@ -39,6 +39,7 @@ namespace Rust
             } 
             catch (Exception e) 
             {
+                Console.WriteLine(e.ToString());
                 DeploymentResults.ExceptionThrown = true;
                 DeploymentResults.Exceptions.Add(e);
             }
@@ -130,7 +131,6 @@ namespace Rust
                 using (StreamWriter writer = new StreamWriter(String.Format(@"{0}\ports.cfg", cfg.AppPath), true))
                     writer.WriteLine(port);
 
-                Directory.Delete(String.Format(@"{0}\xml", cfg.AppPath), true);
                 DeploymentResults.Port = port;
             }
         }
@@ -208,94 +208,93 @@ namespace Rust
                 )
             );
 
-            XDocument updater = new XDocument(
-                new XElement("Service",
-                    new XElement("Program",
-                        new XElement("Name", String.Format("Rust - {0} Update", ident)),
-                        new XElement("DisplayName", String.Format("Rust - {0} Update", ident)),
-                        new XElement("Description", "Updates server. Turn off server before running. Let this run for 60 seconds."),
-                        new XElement("WorkingDir", cfg.SteamPath),
-                        new XElement("Executable", String.Format(@"{0}\steamcmd.exe", cfg.SteamPath)),
-                        new XElement("Parameters", String.Format(@"+runscript {0}\scripts\{1}.txt", cfg.AppPath, ident)),
-                        new XElement("Delay", "3000"),
-                        new XElement("StartUpMode", "0"),
-                        new XElement("ForceReplace", "true")
-                    ),
-                    new XElement("Options",
-                        new XElement("AffinityMask", "0"),
-                        new XElement("Priority", "0"),
-                        new XElement("AppendLogs", "true"),
-                        new XElement("EventLogging", "true"),
-                        new XElement("InteractWithDesktop", "true"),
-                        new XElement("PreLaunchDelay", "0"),
-                        new XElement("ConsoleApp", "false"),
-                        new XElement("CtrlC", "0"),
-                        new XElement("UponExit", "0"),
-                        new XElement("UponFlap", "0"),
-                        new XElement("FlapCount", "0"),
-                        new XElement("UponFail", "0"),
-                        new XElement("FailCount", "0"),
-                        new XElement("ShutdownDelay", "5000"),
-                        new XElement("PreShutdown", "0"),
-                        new XElement("PreShutdownDelay", "180000"),
-                        new XElement("ShowWindow", "0"),
-                        new XElement("JobType", "0"),
-                        new XElement("IgnoreFlags", "3")
-                    ),
-                    new XElement("SMF", new XElement("SMFEnabled", "true"), new XElement("SMFFrequency", "5000")),
-                    new XElement("Scheduling",
-                        new XElement("StartTime", "00:00:00"),
-                        new XElement("EndTime", "00:00:00"),
-                        new XElement("RunDays", "127"),
-                        new XElement("MonthFrom", "0"),
-                        new XElement("MonthTo", "0"),
-                        new XElement("RestartFreq", "0"),
-                        new XElement("RestartEvery", "60"),
-                        new XElement("RestartDelay", "0"),
-                        new XElement("RestartTime", "00:00:00")
-                    ),
-                    new XElement("PreService",
-                        new XElement("PreWorkingDir", String.Format(@"{0}\scripts", cfg.AppPath)),
-                        new XElement("PreExecutable", String.Format(@"{0}\scripts\stopservice.bat", cfg.AppPath)),
-                        new XElement("PreEventOrder", "1"),
-                        new XElement("PreDeatched", "1"),
-                        new XElement("PreParameters", String.Format(@"""Rust - {0}""", ident)),
-                        new XElement("PreDelay", "3000")
-                    ),
-                    new XElement("PostService",
-                        new XElement("PostWorkingDir", String.Format(@"{0}\scripts", cfg.AppPath)),
-                        new XElement("PostExecutable", String.Format(@"{0}\scripts\stopservice.bat", cfg.AppPath)),
-                        new XElement("PostEventOrder", "2"),
-                        new XElement("PostDeatched", "1"),
-                        new XElement("PostParameters", String.Format(@"""Rust - {0} Update""", ident)),
-                        new XElement("PostDelay", "3000")
-                    ),
-                    new XElement("DlgResponder",
-                        new XElement("Enabled", "false"),
-                        new XElement("CloseAll", "false"),
-                        new XElement("CheckFrequency", "5000"),
-                        new XElement("IgnoreUnknowns", "true"),
-                        new XElement("Responses")
-                    ),
-                    new XElement("Recovery",
-                        new XElement("FirstFailure", "0"),
-                        new XElement("SecondFailure", "0"),
-                        new XElement("Subsequent", "0"),
-                        new XElement("ResetFailCountAfter", "0"),
-                        new XElement("RestartServiceDelay", "0"),
-                        new XElement("RestartComputerDelay", "0"),
-                        new XElement("Program"),
-                        new XElement("CommandLineParams"),
-                        new XElement("AppendFailCount", "false"),
-                        new XElement("EnableActionsForStopWithErrors", "false"),
-                        new XElement("SendMsg", "false"),
-                        new XElement("RebootMsg")
-                    )
-                )
-            );
+            //XDocument updater = new XDocument(
+            //    new XElement("Service",
+            //        new XElement("Program",
+            //            new XElement("Name", String.Format("Rust - {0} Update", ident)),
+            //            new XElement("DisplayName", String.Format("Rust - {0} Update", ident)),
+            //            new XElement("Description", "Updates server. Turn off server before running. Let this run for 60 seconds."),
+            //            new XElement("WorkingDir", cfg.SteamPath),
+            //            new XElement("Executable", String.Format(@"{0}\steamcmd.exe", cfg.SteamPath)),
+            //            new XElement("Parameters", String.Format(@"+runscript {0}\scripts\{1}.txt", cfg.AppPath, ident)),
+            //            new XElement("Delay", "3000"),
+            //            new XElement("StartUpMode", "0"),
+            //            new XElement("ForceReplace", "true")
+            //        ),
+            //        new XElement("Options",
+            //            new XElement("AffinityMask", "0"),
+            //            new XElement("Priority", "0"),
+            //            new XElement("AppendLogs", "true"),
+            //            new XElement("EventLogging", "true"),
+            //            new XElement("InteractWithDesktop", "true"),
+            //            new XElement("PreLaunchDelay", "0"),
+            //            new XElement("ConsoleApp", "false"),
+            //            new XElement("CtrlC", "0"),
+            //            new XElement("UponExit", "0"),
+            //            new XElement("UponFlap", "0"),
+            //            new XElement("FlapCount", "0"),
+            //            new XElement("UponFail", "0"),
+            //            new XElement("FailCount", "0"),
+            //            new XElement("ShutdownDelay", "5000"),
+            //            new XElement("PreShutdown", "0"),
+            //            new XElement("PreShutdownDelay", "180000"),
+            //            new XElement("ShowWindow", "0"),
+            //            new XElement("JobType", "0"),
+            //            new XElement("IgnoreFlags", "3")
+            //        ),
+            //        new XElement("SMF", new XElement("SMFEnabled", "true"), new XElement("SMFFrequency", "5000")),
+            //        new XElement("Scheduling",
+            //            new XElement("StartTime", "00:00:00"),
+            //            new XElement("EndTime", "00:00:00"),
+            //            new XElement("RunDays", "127"),
+            //            new XElement("MonthFrom", "0"),
+            //            new XElement("MonthTo", "0"),
+            //            new XElement("RestartFreq", "0"),
+            //            new XElement("RestartEvery", "60"),
+            //            new XElement("RestartDelay", "0"),
+            //            new XElement("RestartTime", "00:00:00")
+            //        ),
+            //        new XElement("PreService",
+            //            new XElement("PreWorkingDir", String.Format(@"{0}\scripts", cfg.AppPath)),
+            //            new XElement("PreExecutable", String.Format(@"{0}\scripts\stopservice.bat", cfg.AppPath)),
+            //            new XElement("PreEventOrder", "1"),
+            //            new XElement("PreDeatched", "1"),
+            //            new XElement("PreParameters", String.Format(@"""Rust - {0}""", ident)),
+            //            new XElement("PreDelay", "3000")
+            //        ),
+            //        new XElement("PostService",
+            //            new XElement("PostWorkingDir", String.Format(@"{0}\scripts", cfg.AppPath)),
+            //            new XElement("PostExecutable", String.Format(@"{0}\scripts\stopservice.bat", cfg.AppPath)),
+            //            new XElement("PostEventOrder", "2"),
+            //            new XElement("PostDeatched", "1"),
+            //            new XElement("PostParameters", String.Format(@"""Rust - {0} Update""", ident)),
+            //            new XElement("PostDelay", "3000")
+            //        ),
+            //        new XElement("DlgResponder",
+            //            new XElement("Enabled", "false"),
+            //            new XElement("CloseAll", "false"),
+            //            new XElement("CheckFrequency", "5000"),
+            //            new XElement("IgnoreUnknowns", "true"),
+            //            new XElement("Responses")
+            //        ),
+            //        new XElement("Recovery",
+            //            new XElement("FirstFailure", "0"),
+            //            new XElement("SecondFailure", "0"),
+            //            new XElement("Subsequent", "0"),
+            //            new XElement("ResetFailCountAfter", "0"),
+            //            new XElement("RestartServiceDelay", "0"),
+            //            new XElement("RestartComputerDelay", "0"),
+            //            new XElement("Program"),
+            //            new XElement("CommandLineParams"),
+            //            new XElement("AppendFailCount", "false"),
+            //            new XElement("EnableActionsForStopWithErrors", "false"),
+            //            new XElement("SendMsg", "false"),
+            //            new XElement("RebootMsg")
+            //        )
+            //    )
+            //);
 
             WriteXml(service, ident);
-            WriteXml(updater, String.Format("{0}-update", ident));
         }
     }
 }

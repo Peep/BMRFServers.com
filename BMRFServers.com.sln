@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RustService", "RustService\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RustServiceHost", "RustServiceHost\RustServiceHost.csproj", "{B19B0078-B6CE-4905-84E3-900D0A0BD094}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleHost", "ConsoleHost\ConsoleHost.csproj", "{09948406-FEEA-4FD3-A792-F7EB6808CB94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B19B0078-B6CE-4905-84E3-900D0A0BD094}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B19B0078-B6CE-4905-84E3-900D0A0BD094}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B19B0078-B6CE-4905-84E3-900D0A0BD094}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09948406-FEEA-4FD3-A792-F7EB6808CB94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09948406-FEEA-4FD3-A792-F7EB6808CB94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09948406-FEEA-4FD3-A792-F7EB6808CB94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09948406-FEEA-4FD3-A792-F7EB6808CB94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

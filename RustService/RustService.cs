@@ -67,7 +67,7 @@ namespace Rust
         {
             try 
             {
-                using (StreamWriter scriptWriter = new StreamWriter(Path.Combine(cfg.AppPath, "scripts", ident), true)) 
+                using (StreamWriter scriptWriter = new StreamWriter(Path.Combine(cfg.AppPath, "scripts", ident + ".txt"), true)) 
                 {
                     scriptWriter.WriteLine("@ShutdownOnFailedCommand 1");
                     scriptWriter.WriteLine("@NoPromptForPassword 1");
@@ -125,8 +125,8 @@ namespace Rust
 
                 Logger.Log(String.Format("Starting new Customer installation for {0}", Identifier));
 
-                if (!Directory.Exists(Path.Combine(cfg.InstallPath, "scripts")))
-                    Directory.CreateDirectory(Path.Combine(cfg.InstallPath, "scripts"));
+                if (!Directory.Exists(Path.Combine(cfg.AppPath, "scripts")))
+                    Directory.CreateDirectory(Path.Combine(cfg.AppPath, "scripts"));
 
                 if (!File.Exists(String.Format(@"{0}\scripts\{1}.txt", cfg.AppPath, Identifier)))
                 {
@@ -157,8 +157,7 @@ namespace Rust
 
                 steam.WaitForExit();
 
-                //Path.Combine(installPath, Identifier, "rust_server_exe")
-                if (File.Exists(Path.Combine(installPath, Identifier, "rust_server_exe")))
+                if (File.Exists(Path.Combine(installPath, Identifier, "rust_server.exe")))
                 {
                     if (File.Exists(Path.Combine(installPath, Identifier, "rust_server_data\\maindata")))
                     {
@@ -266,7 +265,7 @@ namespace Rust
             }
         }
 
-        public Results IsMagmaInstalled(string ident)
+        public MagmaResults IsMagmaInstalled(string ident)
         {
             InitializeConfigurationFile();
             string libFolder = "rust_server_data\\Managed";
@@ -276,9 +275,9 @@ namespace Rust
                     if (File.Exists(Path.Combine(cfg.InstallPath, ident, libFolder, "Mono.Cecil.dll")))
                         if (Directory.Exists(Path.Combine(cfg.InstallPath, ident, "save\\Magma")))
                         {
-                            return new Results { Success = true, Message = String.Format("All core Magma files were found on {0}'s server.", ident) };
+                            return new MagmaResults { Success = true, Installed = true, Message = String.Format("All core Magma files were found on {0}'s server.", ident) };
                         }
-            return new Results { Success = false, Message = String.Format("One or more core Magma files were missing on {0}'s server.", ident) };
+            return new MagmaResults { Success = true, Installed = false, Message = String.Format("One or more core Magma files were missing on {0}'s server.", ident) };
         }
 
         public Results UninstallMagma(string ident)
@@ -333,10 +332,10 @@ namespace Rust
         {
             InitializeConfigurationFile();
             string serviceName = String.Format("Rust - {0}", ident);
-            string xmlPath = Path.Combine(cfg.AppPath, String.Format("export\\{0}_export.xml"));
+            string xmlPath = Path.Combine(cfg.AppPath, String.Format("export\\{0}_export.xml", ident));
 
             if (action < 0 || action > 2)
-                return new CheatpunchResults { Success = true, Message = "This method was not called properly, action must be between 0 and 2." };
+                return new CheatpunchResults { Success = false, Message = "This method was not called properly, action must be between 0 and 2." };
 
             try
             {
@@ -393,8 +392,9 @@ namespace Rust
                         parameters.SetValue(parameters.Value.Replace("-cheatpunch", ""));
                         xDoc.Save(xmlPath);
 
-                        Process.Start(Path.Combine(cfg.FDPath, "FireDaemon.exe"),
+                        var process = Process.Start(Path.Combine(cfg.FDPath, "FireDaemon.exe"),
                             String.Format(@"--install {0} edit", xmlPath));
+                        process.WaitForExit();
 
                         return new CheatpunchResults { Success = true, Enabled = false, Message = "Cheatpunch has been disabled." };
                     }
@@ -409,7 +409,7 @@ namespace Rust
             }
             finally
             {
-                File.Delete(xmlPath);
+                //File.Delete(xmlPath);
             }
         }
 
@@ -431,6 +431,10 @@ namespace Rust
                     dic.Add(splitValues[0], splitValues[1]);
                 else if (splitValues[0] == value)
                     dic.Add(splitValues[0], splitValues[1]);
+            }
+            if (dic.Count == 0)
+            {
+                return new ConfigResults { Success = false, Message = "The specified config value was not present in the file. Add it first." };
             }
             return new ConfigResults { Success = true, ConfigValues = dic };
         }

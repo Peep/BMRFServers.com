@@ -20,7 +20,7 @@ namespace Rust
         Results InstallMagma(string ident);
 
         [OperationContract]
-        Results IsMagmaInstalled(string ident);
+        MagmaResults IsMagmaInstalled(string ident);
 
         [OperationContract]
         Results UninstallMagma(string ident);
