@@ -17,36 +17,15 @@ namespace Rust
         public Config cfg;
         public string Identifier;
 
-        public string GetData(int value) 
-        {
-            return string.Format("You entered: {0}", value);
-        }
-
-        public CompositeType GetDataUsingDataContract(CompositeType composite) 
-        {
-            if (composite == null) 
-            {
-                throw new ArgumentNullException("composite");
-            }
-            if (composite.BoolValue) 
-            {
-                composite.StringValue += "Suffix";
-            }
-            return composite;
-        }
-
         public void InitializeConfigurationFile() 
         {
             string configDir = "C:\\servertools\\RustDeployService";
 
             if (!Directory.Exists(configDir))
-            {
                 Directory.CreateDirectory(configDir);
-            }
+
             if (cfg == null)
-            {
                 cfg = new Config(configDir + "\\Settings.cfg");
-            }
         }
 
         private void WriteToEventLog(string message, EventLogEntryType type)
@@ -88,7 +67,7 @@ namespace Rust
         {
             try 
             {
-                using (StreamWriter scriptWriter = new StreamWriter(String.Format(@"{0}\scripts\{1}.txt", cfg.AppPath, ident), true)) 
+                using (StreamWriter scriptWriter = new StreamWriter(Path.Combine(cfg.AppPath, "scripts", ident), true)) 
                 {
                     scriptWriter.WriteLine("@ShutdownOnFailedCommand 1");
                     scriptWriter.WriteLine("@NoPromptForPassword 1");
@@ -106,12 +85,11 @@ namespace Rust
 
         public void CreateServerConfig() 
         {
+            string configPath = "save\\myserverdata\\cfg";
             try 
             {
-                if (!Directory.Exists(String.Format(@"{0}\{1}\save\myserverdata\cfg", cfg.InstallPath, Identifier)))
-                {
-                    Directory.CreateDirectory(String.Format(@"{0}\{1}\save\myserverdata\cfg", cfg.InstallPath, Identifier));
-                }
+                if (!Directory.Exists(Path.Combine(cfg.InstallPath, Identifier, configPath)))
+                    Directory.CreateDirectory(Path.Combine(cfg.InstallPath, Identifier, configPath));
 
                 var chars = "abcdefghijklmnopqrstuvwxyz0123456789";
                 var random = new Random();
@@ -121,7 +99,7 @@ namespace Rust
                 .Select(s => s[random.Next(s.Length)])
                 .ToArray());
 
-                using (StreamWriter cfgWriter = new StreamWriter(String.Format(@"{0}\{1}\save\myserverdata\cfg\server.cfg", cfg.InstallPath, Identifier))) 
+                using (StreamWriter cfgWriter = new StreamWriter(Path.Combine(cfg.InstallPath, Identifier, configPath, "server.cfg"))) 
                 {
                     cfgWriter.WriteLine(String.Format(@"server.hostname ""{0}'s BMRFServers.com Rust Server""", Identifier));
                     cfgWriter.WriteLine(String.Format(@"rcon.password ""{0}""", rconPass));
@@ -147,10 +125,8 @@ namespace Rust
 
                 Logger.Log(String.Format("Starting new Customer installation for {0}", Identifier));
 
-                if (!Directory.Exists(String.Format(@"{0}\scripts", cfg.AppPath)))
-                {
-                    Directory.CreateDirectory(String.Format(@"{0}\scripts", cfg.AppPath));
-                }
+                if (!Directory.Exists(Path.Combine(cfg.InstallPath, "scripts")))
+                    Directory.CreateDirectory(Path.Combine(cfg.InstallPath, "scripts"));
 
                 if (!File.Exists(String.Format(@"{0}\scripts\{1}.txt", cfg.AppPath, Identifier)))
                 {
@@ -160,7 +136,7 @@ namespace Rust
 
                 Process steam = new Process();
 
-                steam.StartInfo.FileName = String.Format(@"{0}\steamcmd.exe", cfg.SteamPath);
+                steam.StartInfo.FileName = Path.Combine(cfg.SteamPath, "steamcmd.exe");
                 steam.StartInfo.UseShellExecute = false;
 
                 steam.StartInfo.Arguments = String.Format(@"+runscript {0}\scripts\{1}.txt",
@@ -181,9 +157,10 @@ namespace Rust
 
                 steam.WaitForExit();
 
-                if (File.Exists(String.Format(@"{0}\{1}\rust_server.exe", installPath, Identifier)))
+                //Path.Combine(installPath, Identifier, "rust_server_exe")
+                if (File.Exists(Path.Combine(installPath, Identifier, "rust_server_exe")))
                 {
-                    if (File.Exists(String.Format(@"{0}\{1}\rust_server_data\mainData", installPath, Identifier)))
+                    if (File.Exists(Path.Combine(installPath, Identifier, "rust_server_data\\maindata")))
                     {
                         CreateServerConfig();
                         Logger.Log("Rust seems to have installed successfully.");
@@ -192,9 +169,9 @@ namespace Rust
                 }
                 else
                 {
-                    Console.WriteLine("Couldn't find critical game files, aborting installation.");                
+                    Console.WriteLine("Couldn't find critical game files, aborting installation.");
                     Logger.Log("Couldn't find critical game files, aborting installation.");
-                    Directory.Delete(String.Format(@"{0}\{1}", installPath, Identifier));
+                    Directory.Delete(Path.Combine(installPath, Identifier));
                 }
             } 
             catch (Exception e) 
@@ -214,32 +191,22 @@ namespace Rust
                 StopServer(ident);
                 Directory.Delete(Path.Combine(cfg.InstallPath, ident), true);
 
-                XDocument xDoc = XDocument.Load(String.Format(@"{0}\FileZilla Server.xml", cfg.FileZillaPath));
+                XDocument xDoc = XDocument.Load(Path.Combine(cfg.FileZillaPath, "FileZilla Server.xml"));
 
                 foreach (var item in xDoc.Descendants("User"))
                 {
                     if (item.Attribute("Name").Value == ident)
-                    {
                         item.Attribute("Name").Remove();
-                    }
                 }
-              
-                xDoc.Save(String.Format(@"{0}\FileZilla Server.xml", cfg.FileZillaPath));
+
+                xDoc.Save(Path.Combine(cfg.FileZillaPath, "FileZilla Server.xml"));
                 Process.Start(cfg.FileZillaPath + "\\FileZilla Server.exe", "/reload-config");
 
-                return new Results
-                {
-                    Success = true,
-                    Message = "The specified user was successfully removed from this machine."
-                };
+                return new Results { Success = true, Message = "The specified user was successfully removed from this machine." };
             }
             else
             {
-                return new Results
-                {
-                    Success = false,
-                    Message = "That user was not found on this machine."
-                };
+                return new Results { Success = false, Message = "That user was not found on this machine." };
             }
         }
 
@@ -248,23 +215,16 @@ namespace Rust
             InitializeConfigurationFile();
 
             if (!File.Exists(String.Format(@"{0}\scripts\{1}.txt", cfg.InstallPath, ident)))
-            {
                 CreateSteamScript(ident);
-            }
 
             var stop = StopServer(ident);
+
             if (!stop.Success)
-            {
-                return new Results
-                {
-                    Success = false,
-                    Message = stop.Message
-                };
-            }
+                return new Results { Success = false, Message = stop.Message };
 
             Process steam = new Process();
 
-            steam.StartInfo.FileName = String.Format(@"{0}\steamcmd.exe", cfg.SteamPath);
+            steam.StartInfo.FileName = Path.Combine(cfg.SteamPath, "steamcmd.exe");
             steam.StartInfo.UseShellExecute = false;
 
             steam.StartInfo.Arguments = String.Format(@"+runscript {0}\scripts\{1}.txt",
@@ -276,120 +236,72 @@ namespace Rust
 
             StartServer(ident);
 
-            return new Results
-            {
-                Success = true,
-                Message = "Your Rust server has been updated successfully."
-            };
+            return new Results { Success = true, Message = "Your Rust server has been updated successfully." };
         }
 
         public Results InstallMagma(string ident)
         {
             InitializeConfigurationFile();
+            if (!Directory.Exists(Path.Combine(cfg.InstallPath, ident, "rust_server_Data")))
+                return new Results { Success = false, Message = "The specified user was not found on this machine." };
 
-            if (!Directory.Exists(String.Format(@"{0}\{1}\rust_server_Data", cfg.InstallPath, ident)))
-            {
-                return new Results
-                {
-                    Success = false,
-                    Message = "The specified user was not found on this machine."
-                };
-            }
-
-            if (!Directory.Exists(String.Format(@"{0}\magma\rust_server_Data", cfg.AppPath)))
-            {
-                return new Results
-                {
-                    Success = false,
-                    Message = "This machine is not setup to support Magma installations."
-                };
-            }
+            if (!Directory.Exists(Path.Combine(cfg.AppPath, "magma\\rust_server_Data")))
+                return new Results { Success = false, Message = "This machine is not setup to support Magma installations." };
 
             try
             {
                 StartServer(ident);
 
-                CopyDirectory(String.Format(@"{0}\magma\rust_server_Data", cfg.AppPath),
-                              String.Format(@"{0}\{1}\rust_server_Data", cfg.InstallPath, ident));
+                CopyDirectory(Path.Combine(cfg.AppPath, "magma\\rust_server_Data"),
+                              Path.Combine(cfg.InstallPath, ident, "rust_server_Data"));
 
-                CopyDirectory(String.Format(@"{0}\magma\save", cfg.AppPath),
-                              String.Format(@"{0}\{1}\save", cfg.InstallPath, ident));
+                CopyDirectory(Path.Combine(cfg.AppPath, "magma\\save"),
+                              Path.Combine(cfg.InstallPath, ident, "save"));
 
-                return new Results
-                {
-                    Success = true,
-                    Message = "The operation completed successfully."
-                };
+                return new Results { Success = true, Message = "The operation completed successfully." };
             }
             catch (Exception e)
             {
-                return new Results 
-                {
-                    Success = false,
-                    Message = "Exception: " + e.ToString()
-                };
+                return new Results { Success = false, Message = "Exception: " + e.ToString() };
             }
         }
 
         public Results IsMagmaInstalled(string ident)
         {
             InitializeConfigurationFile();
+            string libFolder = "rust_server_data\\Managed";
 
-            if (File.Exists(String.Format(@"{0}\{1}\rust_server_Data\Managed\Jint.dll", cfg.InstallPath, ident)))
-                if (File.Exists(String.Format(@"{0}\{1}\rust_server_Data\Managed\Magma.dll", cfg.InstallPath, ident)))
-                    if (File.Exists(String.Format(@"{0}\{1}\rust_server_Data\Managed\Mono.Cecil.dll", cfg.InstallPath, ident)))
-                        if (Directory.Exists(String.Format(@"{0}\{1}\save\Magma", cfg.InstallPath, ident)))
+            if (File.Exists(Path.Combine(cfg.InstallPath, ident, libFolder, "Jint.dll")))
+                if (File.Exists(Path.Combine(cfg.InstallPath, ident, libFolder, "Magma.dll")))
+                    if (File.Exists(Path.Combine(cfg.InstallPath, ident, libFolder, "Mono.Cecil.dll")))
+                        if (Directory.Exists(Path.Combine(cfg.InstallPath, ident, "save\\Magma")))
                         {
-                            return new Results
-                            {
-                                Success = true,
-                                Message = String.Format("All core Magma files were found on {0}'s server.", ident)
-                            };
+                            return new Results { Success = true, Message = String.Format("All core Magma files were found on {0}'s server.", ident) };
                         }
-            return new Results
-            {
-                Success = false,
-                Message = String.Format("One or more core Magma files were missing on {0}'s server.", ident)
-            };
+            return new Results { Success = false, Message = String.Format("One or more core Magma files were missing on {0}'s server.", ident) };
         }
 
         public Results UninstallMagma(string ident)
         {
             InitializeConfigurationFile();
+            string libFolder = "rust_server_data\\Managed";
 
             try
             {
                 StopServer(ident);
 
-                File.Copy(String.Format(@"{0}\premagma\rust_server_Data\managed\Assembly-CSharp.dll", cfg.AppPath),
-                          String.Format(@"{0}\{1}\rust_server_Data\Managed\Assembly-CSharp.dll", cfg.InstallPath, ident), true);
+                File.Copy(Path.Combine(cfg.AppPath, "premagma", libFolder, "Assembly-CSharp.dll"),
+                          Path.Combine(cfg.InstallPath, ident, libFolder, "Assembly-CSharp.dll"), true);
+                File.Delete(Path.Combine(cfg.InstallPath, ident, libFolder, "Jint.dll"));
+                File.Delete(Path.Combine(cfg.InstallPath, ident, libFolder, "Magma.dll"));
+                File.Delete(Path.Combine(cfg.InstallPath, ident, libFolder, "Mono.Cecil.dll"));
 
-                File.Delete(String.Format(@"{0}\{1}\rust_server_data\Managed\Jint.dll", cfg.InstallPath, ident));
-                File.Delete(String.Format(@"{0}\{1}\rust_server_data\Managed\Magma.dll", cfg.InstallPath, ident));
-                File.Delete(String.Format(@"{0}\{1}\rust_server_data\Managed\Mono.Cecil.dll", cfg.InstallPath, ident));
-
-                return new Results
-                {
-                    Success = true,
-                    Message = String.Format("Magma was successfully uninstalled from {0}'s server", ident)
-                };
+                return new Results { Success = true, Message = String.Format("Magma was successfully uninstalled from {0}'s server", ident) };
             }
             catch (Exception e)
             {
-                return new Results
-                {
-                    Success = false,
-                    Message = "Exception: " + e.ToString()
-                };
+                return new Results { Success = false, Message = "Exception: " + e.ToString() };
             }
-        }
-
-        public Results ChangeConfigValue(string ident, string key, string value)
-        {
-            return new Results
-            {
-
-            };
         }
 
         public Results ChangeFtpPass(string ident, string newPass)
@@ -417,11 +329,14 @@ namespace Rust
             }
         }
 
-        public Results ToggleCheatpunch(string ident, bool enabled)
+        public CheatpunchResults ToggleCheatpunch(string ident, int action)
         {
             InitializeConfigurationFile();
             string serviceName = String.Format("Rust - {0}", ident);
-            string xmlPath = Path.Combine(cfg.AppPath, "export\\export.xml");
+            string xmlPath = Path.Combine(cfg.AppPath, String.Format("export\\{0}_export.xml"));
+
+            if (action < 0 || action > 2)
+                return new CheatpunchResults { Success = true, Message = "This method was not called properly, action must be between 0 and 2." };
 
             try
             {
@@ -434,14 +349,15 @@ namespace Rust
                 using (var fd = new Process())
                 {
                     fd.StartInfo.FileName = Path.Combine(cfg.FDPath, "FireDaemon.exe");
-
                     fd.StartInfo.Arguments = String.Format(@"--export ""{0}"" {1}",
-                        serviceName, Path.Combine(cfg.AppPath, "export\\export.xml"));
+                        serviceName, xmlPath);
 
                     fd.Start();
                     fd.WaitForExit();
                 }
 
+                // Skip the first two lines in the exported file
+                // This is done to remove the comment header so it will save properly.
                 var lines = File.ReadAllLines(xmlPath);
                 File.WriteAllLines(xmlPath, lines.Skip(2).ToArray());
 
@@ -453,47 +369,121 @@ namespace Rust
                                       where x.Element("Name").Value == serviceName
                                       select x.Element("Parameters")).FirstOrDefault();
 
-                    if (parameters.Value.Contains("-cheatpunch") && enabled)
-                        return new Results { Success = true, Message = "Cheatpunch is already enabled" };
+                    if (parameters.Value.Contains("-cheatpunch") && action == 2)
+                        return new CheatpunchResults { Success = true, Enabled = true, Message = "Cheatpunch is enabled" };
 
-                    else if (!parameters.Value.Contains("-cheatpunch") && enabled)
+                    if (!parameters.Value.Contains("-cheatpunch") && action == 2)
+                        return new CheatpunchResults { Success = true, Enabled = false, Message = "Cheatpunch is disabled" };
+
+                    if (parameters.Value.Contains("-cheatpunch") && action == 1)
+                        return new CheatpunchResults { Success = true, Enabled = true, Message = "Cheatpunch is already enabled" };
+
+                    else if (!parameters.Value.Contains("-cheatpunch") && action == 1)
                     {
                         parameters.SetValue(parameters.Value + " -cheatpunch");
-
                         xDoc.Save(xmlPath);
 
                         Process.Start(Path.Combine(cfg.FDPath, "FireDaemon.exe"),
                             String.Format(@"--install {0} edit", xmlPath));
 
-                        return new Results { Success = true, Message = "Cheatpunch has been enabled." };
+                        return new CheatpunchResults { Success = true, Enabled = true, Message = "Cheatpunch has been enabled." };
                     }
-                    else if (parameters.Value.Contains("-cheatpunch") && !enabled)
+                    else if (parameters.Value.Contains("-cheatpunch") && action == 0)
                     {
                         parameters.SetValue(parameters.Value.Replace("-cheatpunch", ""));
-
                         xDoc.Save(xmlPath);
 
                         Process.Start(Path.Combine(cfg.FDPath, "FireDaemon.exe"),
                             String.Format(@"--install {0} edit", xmlPath));
 
-                        return new Results { Success = true, Message = "Cheatpunch has been disabled." };
+                        return new CheatpunchResults { Success = true, Enabled = false, Message = "Cheatpunch has been disabled." };
                     }
                 }
-                else
-                {
-                    return new Results { Success = false, Message = "It never works the first time." };
-                }
-                return new Results { Success = false, Message = "Reached the end without returning." };
+
+                return new CheatpunchResults { Success = false, Message = "No clauses were satisfied. Does the user exist?" };
             }
             catch (Exception e)
             {
                 Logger.Log(e.ToString());
-                return new Results { Success = false, Message = e.ToString() };
+                return new CheatpunchResults { Success = false, Message = e.ToString() };
             }
             finally
             {
                 File.Delete(xmlPath);
             }
+        }
+
+        public ConfigResults GetConfigValue(string ident, string value = "all")
+        {
+            InitializeConfigurationFile();
+            string configPath = Path.Combine(cfg.InstallPath, ident, "save\\myserverdata\\cfg\\server.cfg");
+
+            if (!File.Exists(configPath))
+                return new ConfigResults { Success = false, Message = "Config file not found. Either the file is missing or the user doesn't exist." };
+
+            var configFile = File.ReadAllLines(configPath);
+            var dic = new Dictionary<string, string>();
+
+            foreach (var line in configFile)
+            {
+                var splitValues = line.Split(new char[] {' '}, 2);
+                if (value == "all")
+                    dic.Add(splitValues[0], splitValues[1]);
+                else if (splitValues[0] == value)
+                    dic.Add(splitValues[0], splitValues[1]);
+            }
+            return new ConfigResults { Success = true, ConfigValues = dic };
+        }
+
+        public Results SetConfigValue(string ident, string key, string value)
+        {
+            try
+            {
+                InitializeConfigurationFile();
+                string configPath = Path.Combine(cfg.InstallPath, ident, "save\\myserverdata\\cfg\\server.cfg");
+
+                if (!File.Exists(configPath))
+                    return new Results { Success = false, Message = "Config file not found. Either the file is missing or the user doesn't exist." };
+
+                var configFile = File.ReadAllLines(configPath);
+
+                for (int i = 0; i < configFile.Length; i++)
+                {
+                    var splitValues = configFile[i].Split(new char[] { ' ' }, 2); // Separate the key and value using a space.
+                    if (splitValues[0] == key) // If the specified key exists, update it's value, write, and return.
+                    {
+                        splitValues[1] = value;
+                        configFile[i] = String.Format(@"{0} ""{1}""", splitValues[0], splitValues[1]);
+                        File.WriteAllLines(configPath, configFile);
+                        return new Results { Success = true, Message = "The existing config value was updated." };
+                    }
+                }
+
+                using (var writer = new StreamWriter(configPath, true)) // If we haven't returned yet, assume the value doesn't exist and write it as a new line.
+                    writer.WriteLine(String.Format(@"{0} ""{1}""", key, value));
+
+                return new Results { Success = true, Message = "The specified config value was added to the config file" };
+            }
+            catch (Exception e)
+            {
+                WriteToEventLog(e.ToString(), EventLogEntryType.Error);
+                return new Results { Success = false, Message = "An error occurred while trying to write to your config file, please contact support." };
+            }
+        }
+
+        public ServiceResults ServerStatus(string ident)
+        {
+            ServiceController ctl = ServiceController.GetServices().FirstOrDefault
+                (s => s.ServiceName == String.Format("Rust - {0}", ident));
+
+            if (ctl == null)
+            {
+                WriteToEventLog(String.Format("An incorrect call was made to StartServer(): Identifier '{0}' does not exist on this machine.",
+                                    ident), EventLogEntryType.FailureAudit);
+                return new ServiceResults { Success = false, Message = "Unable to find a server associated with your account, please contact support." };
+            }
+            string status = ctl.Status.ToString();
+            return new ServiceResults { Success = true, Status = status, Message = "Your Rust server is " + status };
         }
 
         public Results StartServer(string ident)
@@ -507,21 +497,11 @@ namespace Rust
                 {
                     WriteToEventLog(String.Format("An incorrect call was made to StartServer(): Identifier '{0}' does not exist on this machine.",
                                         ident), EventLogEntryType.FailureAudit);
-                    return new Results
-                    {
-                        Success = false,
-                        Message = "Unable to find a server associated with your account, please contact support."
-                    };
+                    return new Results { Success = false, Message = "Unable to find a server associated with your account, please contact support." };
                 }
 
                 if (ctl.Status == ServiceControllerStatus.Running)
-                {
-                    return new Results
-                    {
-                        Success = true,
-                        Message = "Your Rust server is already running."
-                    };
-                }
+                    return new Results { Success = true, Message = "Your Rust server is already running." };
 
                 ctl.Start();
                 ctl.WaitForStatus(ServiceControllerStatus.Running, new TimeSpan(0, 0, 5));
@@ -531,28 +511,15 @@ namespace Rust
                     WriteToEventLog(String.Format("Server assigned to '{0}' has been started successfully.",
                                         ident), EventLogEntryType.SuccessAudit);
                     return new Results
-                    {
-                        Success = true,
-                        Message = "Your Rust server has been started."
-                    };
+                    { Success = true, Message = "Your Rust server has been started." };
                 }
                 else
-                {
-                    return new Results
-                    {
-                        Success = false,
-                        Message = "Timed out while attempting to start your Rust server, please contact support."
-                    };
-                }
+                    return new Results { Success = false, Message = "Timed out while attempting to start your Rust server, please contact support." };
             }
             catch (Exception e)
             {
                 WriteToEventLog(e.ToString(), EventLogEntryType.Error);
-                return new Results
-                {
-                    Success = false,
-                    Message = "An error occured while attempting to start your Rust server, please contact support."
-                };
+                return new Results { Success = false, Message = "An error occured while attempting to start your Rust server, please contact support." };
             }
         }
 
@@ -567,21 +534,11 @@ namespace Rust
                 {
                     WriteToEventLog(String.Format("An incorrect call was made to StopServer(): Identifier '{0}' does not exist on this machine.",
                                         ident), EventLogEntryType.FailureAudit);
-                    return new Results
-                    {
-                        Success = false,
-                        Message = "Unable to find a server associated with your account, please contact support."
-                    };
+                    return new Results { Success = false, Message = "Unable to find a server associated with your account, please contact support." };
                 }
 
                 if (ctl.Status == ServiceControllerStatus.Stopped)
-                {
-                    return new Results
-                    {
-                        Success = true,
-                        Message = "Your Rust server is already stopped."
-                    };
-                }
+                    return new Results { Success = true, Message = "Your Rust server is already stopped." };
 
                 ctl.Stop();
                 ctl.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 5));
@@ -590,29 +547,17 @@ namespace Rust
                 {
                     WriteToEventLog(String.Format("Server assigned to '{0}' has been stopped successfully.",
                                        ident), EventLogEntryType.SuccessAudit);
-                    return new Results
-                    {
-                        Success = true,
-                        Message = "Your Rust server has been stopped."
-                    };
+                    return new Results { Success = true, Message = "Your Rust server has been stopped." };
                 }
                 else
                 {
-                    return new Results
-                    {
-                        Success = false,
-                        Message = "Timed out while attempting to stop your Rust server, please contact support."
-                    };
+                    return new Results {Success = false, Message = "Timed out while attempting to stop your Rust server, please contact support." };
                 }
             }
             catch (Exception e)
             {
                 WriteToEventLog(e.ToString(), EventLogEntryType.Error);
-                return new Results
-                {
-                    Success = false,
-                    Message = "An error occured while attempting to stop your Rust server, please contact support."
-                };
+                return new Results { Success = false, Message = "An error occured while attempting to stop your Rust server, please contact support." };
             }
         }
 
@@ -629,40 +574,21 @@ namespace Rust
                     ctl.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 5));
 
                     if (!stop.Success)
-                    {
-                        return new Results
-                        {
-                            Success = false,
-                            Message = stop.Message
-                        };
-                    }
+                        return new Results { Success = false, Message = stop.Message };
                 }
 
                 var start = StartServer(ident);
                 ctl.WaitForStatus(ServiceControllerStatus.Running, new TimeSpan(0, 0, 5));
 
                 if (!start.Success)
-                {
-                    return new Results
-                    {
-                        Success = false,
-                        Message = start.Message
-                    };
-                }
-                return new Results
-                {
-                    Success = true,
-                    Message = "Your Rust server has been restarted successfully."
-                };
+                    return new Results { Success = false, Message = start.Message };
+                
+                return new Results { Success = true, Message = "Your Rust server has been restarted successfully." };
             }
             catch (Exception e)
             {
                 WriteToEventLog(e.ToString(), EventLogEntryType.Error);
-                return new Results
-                {
-                    Success = false,
-                    Message = "An error occured while attempting to restart your Rust server, please contact support."
-                };
+                return new Results { Success = false, Message = "An error occured while attempting to restart your Rust server, please contact support." };
             }
         }
 
@@ -693,7 +619,6 @@ namespace Rust
                     stack.Push(new Folders(folder, Path.Combine(folders.Target, Path.GetFileName(folder))));
                 }
             }
-            //Directory.Delete(source, true);
         }
     }
 }

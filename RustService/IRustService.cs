@@ -11,12 +11,6 @@ namespace Rust
     public interface IRustService 
     {
         [OperationContract]
-        string GetData(int value);
-
-        [OperationContract]
-        CompositeType GetDataUsingDataContract(CompositeType composite);
-
-        [OperationContract]
         Dictionary<string, object> DeployRustServer(string identifier, int slots);
 
         [OperationContract]
@@ -32,13 +26,19 @@ namespace Rust
         Results UninstallMagma(string ident);
 
         [OperationContract]
-        Results ChangeConfigValue(string ident, string key, string value);
-
-        [OperationContract]
         Results ChangeFtpPass(string ident, string newPass);
 
         [OperationContract]
-        Results ToggleCheatpunch(string ident, bool enabled);
+        CheatpunchResults ToggleCheatpunch(string ident, int action);
+
+        [OperationContract]
+        ConfigResults GetConfigValue(string ident, string value = "all");
+
+        [OperationContract]
+        Results SetConfigValue(string ident, string key, string value);
+
+        [OperationContract]
+        ServiceResults ServerStatus(string ident);
 
         [OperationContract]
         Results StartServer(string ident);
