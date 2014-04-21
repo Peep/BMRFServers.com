@@ -7,6 +7,7 @@ using System.ServiceModel;
 using Rust;
 using System.ServiceModel.Description;
 using System.ServiceModel.Security;
+using System.ServiceModel.Web;
 
 namespace ConsoleHost
 {
@@ -16,20 +17,22 @@ namespace ConsoleHost
         static void Main(string[] args)
         {
             Uri baseAddress = new Uri("http://bmrfservers.com:8080/TestService");
-            ServiceHost serviceHost;
+            WebServiceHost serviceHost;
             //WSHttpBinding binding = new WSHttpBinding();
-            BasicHttpBinding binding = new BasicHttpBinding();
+            //BasicHttpBinding binding = new BasicHttpBinding();
+            WebHttpBinding binding = new WebHttpBinding();
 
-            binding.Security.Mode = BasicHttpSecurityMode.None;
-            serviceHost = new ServiceHost(typeof(RustService), baseAddress);
+            binding.Security.Mode = WebHttpSecurityMode.None;
+            serviceHost = new WebServiceHost(typeof(RustService), baseAddress);
 
             //serviceHost.Credentials.UserNameAuthentication.UserNamePasswordValidationMode = UserNamePasswordValidationMode.Custom;
             //serviceHost.Credentials.UserNameAuthentication.CustomUserNamePasswordValidator = new CredentialValidator();
             //binding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Basic;
 
-            serviceHost.AddServiceEndpoint(typeof(IRustService), binding, "RustServiceHost");
+            ServiceEndpoint ep = serviceHost.AddServiceEndpoint(typeof(IRustService), binding, "RustServiceHost");
 
-            ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
+            //ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
+            WebHttpBehavior whb = new WebHttpBehavior();
             ServiceDebugBehavior debug = serviceHost.Description.Behaviors.Find<ServiceDebugBehavior>();
 
             // if not found - add behavior with setting turned on 
@@ -47,9 +50,9 @@ namespace ConsoleHost
                 }
             }
 
-            smb.HttpGetEnabled = true;
-            smb.HttpsGetEnabled = true;
-            serviceHost.Description.Behaviors.Add(smb);
+            //whb.HttpGetEnabled = true;
+            //whb.HttpsGetEnabled = true;
+            //serviceHost.Description.Behaviors.Add(whb);
 
             serviceHost.Open();
 

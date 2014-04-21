@@ -9,7 +9,7 @@ namespace Rust
     {
         public override void Validate(string userName, string password) 
         {
-            if (userName != "test" || password != "test123")
+            if (userName != "rustful" || password != "lvixqYgxY7saDOdFvq")
             {
                 throw new SecurityTokenException("Invalid Username or Password.");
             }

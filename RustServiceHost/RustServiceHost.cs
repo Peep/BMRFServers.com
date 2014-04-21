@@ -12,6 +12,7 @@ using System.ServiceModel;
 using Rust;
 using System.ServiceModel.Description;
 using System.ServiceModel.Security;
+using System.ServiceModel.Web;
 using System.Timers;
 using System.IO;
 
@@ -19,10 +20,9 @@ namespace RustServiceHost
 {
     public partial class RustServiceHost : ServiceBase 
     {
-        Uri baseAddress = new Uri("https://bmrfservers.com:8000/TestService");
-        ServiceHost serviceHost;
-        //WSHttpBinding binding = new WSHttpBinding();
-        BasicHttpBinding binding = new BasicHttpBinding();
+        Uri baseAddress = new Uri("https://bmrfservers.com:8000/Rustful");
+        WebServiceHost serviceHost;
+        WebHttpBinding binding = new WebHttpBinding();
 
         public RustServiceHost() 
         {
@@ -33,14 +33,14 @@ namespace RustServiceHost
         {
             try 
             {
-                binding.Security.Mode = BasicHttpSecurityMode.Transport;
-                serviceHost = new ServiceHost(typeof(RustService), baseAddress);
+                binding.Security.Mode = WebHttpSecurityMode.Transport;
+                serviceHost = new WebServiceHost(typeof(RustService), baseAddress);
 
                 serviceHost.Credentials.UserNameAuthentication.UserNamePasswordValidationMode = UserNamePasswordValidationMode.Custom;
                 serviceHost.Credentials.UserNameAuthentication.CustomUserNamePasswordValidator = new CredentialValidator();
                 binding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Basic;
 
-                serviceHost.AddServiceEndpoint(typeof(IRustService), binding, "RustServiceHost");
+                serviceHost.AddServiceEndpoint(typeof(IRustService), binding, "");
 
                 ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
                 ServiceDebugBehavior debug = serviceHost.Description.Behaviors.Find<ServiceDebugBehavior>();
@@ -60,6 +60,8 @@ namespace RustServiceHost
                     }
                 }
 
+                debug.HttpHelpPageEnabled = false;
+
                 smb.HttpGetEnabled = true;
                 smb.HttpsGetEnabled = true;
                 serviceHost.Description.Behaviors.Add(smb);
@@ -69,7 +71,7 @@ namespace RustServiceHost
             } 
             catch (Exception e) 
             {
-                using (var writer = new StreamWriter("C:\\ServiceErrorLog")) 
+                using (var writer = new StreamWriter("C:\\ServiceErrorLog.log")) 
                 {
                     writer.WriteLine(e.ToString());
                 }

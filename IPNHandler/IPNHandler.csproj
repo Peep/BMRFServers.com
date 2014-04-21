@@ -67,19 +67,6 @@
     <Content Include="Properties\DataSources\Rust.MagmaResults.datasource" />
     <Content Include="Properties\DataSources\Rust.Results.datasource" />
     <Content Include="Properties\DataSources\Rust.ServiceResults.datasource" />
-    <None Include="Service References\HttpReference\RustService.wsdl" />
-    <None Include="Service References\HttpReference\TestService.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\HttpReference\TestService1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\HttpReference\TestService2.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\HttpReference\TestService3.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -90,13 +77,6 @@
   <ItemGroup>
     <Content Include="IPNHandler.aspx" />
     <Content Include="Properties\DataSources\Rust.CompositeType.datasource" />
-    <None Include="Service References\HttpReference\TestService.disco" />
-    <None Include="Service References\HttpReference\configuration91.svcinfo" />
-    <None Include="Service References\HttpReference\configuration.svcinfo" />
-    <None Include="Service References\HttpReference\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -108,11 +88,6 @@
       <DependentUpon>IPNHandler.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service References\HttpReference\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RustService\RustService.csproj">
@@ -122,9 +97,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\HttpReference\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

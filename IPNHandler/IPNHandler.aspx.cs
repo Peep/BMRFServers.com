@@ -13,7 +13,6 @@ using System.Collections.Specialized;
 using MySql.Data.MySqlClient;
 using System.Text.RegularExpressions;
 using System.Net.Mail;
-using IPN.HttpReference;
 #endregion
 
 namespace IPN 

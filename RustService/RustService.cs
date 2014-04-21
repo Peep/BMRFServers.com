@@ -265,7 +265,7 @@ namespace Rust
             }
         }
 
-        public MagmaResults IsMagmaInstalled(string ident)
+        public MagmaResults MagmaStatus(string ident)
         {
             InitializeConfigurationFile();
             string libFolder = "rust_server_data\\Managed";
@@ -394,7 +394,6 @@ namespace Rust
 
                         var process = Process.Start(Path.Combine(cfg.FDPath, "FireDaemon.exe"),
                             String.Format(@"--install {0} edit", xmlPath));
-                        process.WaitForExit();
 
                         return new CheatpunchResults { Success = true, Enabled = false, Message = "Cheatpunch has been disabled." };
                     }
