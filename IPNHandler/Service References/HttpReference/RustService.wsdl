@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="RustService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://bmrfservers.com:8080/TestService?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://bmrfservers.com:8080/TestService?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://bmrfservers.com:8080/TestService?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://bmrfservers.com:8080/TestService?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/Rust" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IRustService_DeployRustServer_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeployRustServer" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_DeployRustServer_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeployRustServerResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_RunSteamUpdate_InputMessage">
+    <wsdl:part name="parameters" element="tns:RunSteamUpdate" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_RunSteamUpdate_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RunSteamUpdateResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_InstallMagma_InputMessage">
+    <wsdl:part name="parameters" element="tns:InstallMagma" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_InstallMagma_OutputMessage">
+    <wsdl:part name="parameters" element="tns:InstallMagmaResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_IsMagmaInstalled_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsMagmaInstalled" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_IsMagmaInstalled_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsMagmaInstalledResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_UninstallMagma_InputMessage">
+    <wsdl:part name="parameters" element="tns:UninstallMagma" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_UninstallMagma_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UninstallMagmaResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_ChangeFtpPass_InputMessage">
+    <wsdl:part name="parameters" element="tns:ChangeFtpPass" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_ChangeFtpPass_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ChangeFtpPassResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_ToggleCheatpunch_InputMessage">
+    <wsdl:part name="parameters" element="tns:ToggleCheatpunch" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_ToggleCheatpunch_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ToggleCheatpunchResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_GetConfigValue_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetConfigValue" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_GetConfigValue_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetConfigValueResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_SetConfigValue_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetConfigValue" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_SetConfigValue_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetConfigValueResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_ServerStatus_InputMessage">
+    <wsdl:part name="parameters" element="tns:ServerStatus" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_ServerStatus_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ServerStatusResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_StartServer_InputMessage">
+    <wsdl:part name="parameters" element="tns:StartServer" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_StartServer_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StartServerResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_StopServer_InputMessage">
+    <wsdl:part name="parameters" element="tns:StopServer" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_StopServer_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StopServerResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_RestartServer_InputMessage">
+    <wsdl:part name="parameters" element="tns:RestartServer" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_RestartServer_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RestartServerResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_UninstallRustServer_InputMessage">
+    <wsdl:part name="parameters" element="tns:UninstallRustServer" />
+  </wsdl:message>
+  <wsdl:message name="IRustService_UninstallRustServer_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UninstallRustServerResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IRustService">
+    <wsdl:operation name="DeployRustServer">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/DeployRustServer" message="tns:IRustService_DeployRustServer_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/DeployRustServerResponse" message="tns:IRustService_DeployRustServer_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RunSteamUpdate">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/RunSteamUpdate" message="tns:IRustService_RunSteamUpdate_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/RunSteamUpdateResponse" message="tns:IRustService_RunSteamUpdate_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="InstallMagma">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/InstallMagma" message="tns:IRustService_InstallMagma_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/InstallMagmaResponse" message="tns:IRustService_InstallMagma_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="IsMagmaInstalled">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/IsMagmaInstalled" message="tns:IRustService_IsMagmaInstalled_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/IsMagmaInstalledResponse" message="tns:IRustService_IsMagmaInstalled_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UninstallMagma">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/UninstallMagma" message="tns:IRustService_UninstallMagma_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/UninstallMagmaResponse" message="tns:IRustService_UninstallMagma_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ChangeFtpPass">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/ChangeFtpPass" message="tns:IRustService_ChangeFtpPass_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/ChangeFtpPassResponse" message="tns:IRustService_ChangeFtpPass_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ToggleCheatpunch">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/ToggleCheatpunch" message="tns:IRustService_ToggleCheatpunch_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/ToggleCheatpunchResponse" message="tns:IRustService_ToggleCheatpunch_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetConfigValue">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/GetConfigValue" message="tns:IRustService_GetConfigValue_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/GetConfigValueResponse" message="tns:IRustService_GetConfigValue_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetConfigValue">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/SetConfigValue" message="tns:IRustService_SetConfigValue_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/SetConfigValueResponse" message="tns:IRustService_SetConfigValue_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ServerStatus">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/ServerStatus" message="tns:IRustService_ServerStatus_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/ServerStatusResponse" message="tns:IRustService_ServerStatus_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="StartServer">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/StartServer" message="tns:IRustService_StartServer_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/StartServerResponse" message="tns:IRustService_StartServer_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="StopServer">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/StopServer" message="tns:IRustService_StopServer_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/StopServerResponse" message="tns:IRustService_StopServer_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RestartServer">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/RestartServer" message="tns:IRustService_RestartServer_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/RestartServerResponse" message="tns:IRustService_RestartServer_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UninstallRustServer">
+      <wsdl:input wsaw:Action="http://tempuri.org/IRustService/UninstallRustServer" message="tns:IRustService_UninstallRustServer_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IRustService/UninstallRustServerResponse" message="tns:IRustService_UninstallRustServer_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IRustService" type="tns:IRustService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="DeployRustServer">
+      <soap:operation soapAction="http://tempuri.org/IRustService/DeployRustServer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RunSteamUpdate">
+      <soap:operation soapAction="http://tempuri.org/IRustService/RunSteamUpdate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InstallMagma">
+      <soap:operation soapAction="http://tempuri.org/IRustService/InstallMagma" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsMagmaInstalled">
+      <soap:operation soapAction="http://tempuri.org/IRustService/IsMagmaInstalled" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UninstallMagma">
+      <soap:operation soapAction="http://tempuri.org/IRustService/UninstallMagma" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChangeFtpPass">
+      <soap:operation soapAction="http://tempuri.org/IRustService/ChangeFtpPass" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ToggleCheatpunch">
+      <soap:operation soapAction="http://tempuri.org/IRustService/ToggleCheatpunch" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetConfigValue">
+      <soap:operation soapAction="http://tempuri.org/IRustService/GetConfigValue" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetConfigValue">
+      <soap:operation soapAction="http://tempuri.org/IRustService/SetConfigValue" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ServerStatus">
+      <soap:operation soapAction="http://tempuri.org/IRustService/ServerStatus" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StartServer">
+      <soap:operation soapAction="http://tempuri.org/IRustService/StartServer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StopServer">
+      <soap:operation soapAction="http://tempuri.org/IRustService/StopServer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RestartServer">
+      <soap:operation soapAction="http://tempuri.org/IRustService/RestartServer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UninstallRustServer">
+      <soap:operation soapAction="http://tempuri.org/IRustService/UninstallRustServer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="RustService">
+    <wsdl:port name="BasicHttpBinding_IRustService" binding="tns:BasicHttpBinding_IRustService">
+      <soap:address location="http://bmrfservers.com:8080/TestService/RustServiceHost" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

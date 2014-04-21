@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="da937358-8768-4d5a-bc37-bc10af199a09" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://bmrfservers.com:8080/TestService" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="RustService.wsdl" MetadataType="Wsdl" ID="906a551b-bbd6-43b7-a442-b8061ddeaaed" SourceId="1" SourceUrl="http://bmrfservers.com:8080/TestService?wsdl" />
+    <MetadataFile FileName="TestService.xsd" MetadataType="Schema" ID="fd147da6-b004-4a43-b941-bfab31b15690" SourceId="1" SourceUrl="http://bmrfservers.com:8080/TestService?xsd=xsd0" />
+    <MetadataFile FileName="TestService1.xsd" MetadataType="Schema" ID="3f21db0e-db4c-4240-b2e4-236eb5ad0956" SourceId="1" SourceUrl="http://bmrfservers.com:8080/TestService?xsd=xsd2" />
+    <MetadataFile FileName="TestService.disco" MetadataType="Disco" ID="4e34cdd8-4125-4b69-865b-196d6b34898a" SourceId="1" SourceUrl="http://bmrfservers.com:8080/TestService?disco" />
+    <MetadataFile FileName="TestService2.xsd" MetadataType="Schema" ID="298d942d-264e-4027-9732-24a99a936520" SourceId="1" SourceUrl="http://bmrfservers.com:8080/TestService?xsd=xsd1" />
+    <MetadataFile FileName="TestService3.xsd" MetadataType="Schema" ID="7ecc0437-bd83-4b1c-af47-ce92ae6b9250" SourceId="1" SourceUrl="http://bmrfservers.com:8080/TestService?xsd=xsd3" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

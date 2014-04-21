@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://bmrfservers.com:8080/TestService?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://bmrfservers.com:8080/TestService?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/Rust" />
+  <xs:element name="DeployRustServer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="identifier" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="slots" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeployRustServerResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="DeployRustServerResult" nillable="true" type="q1:ArrayOfKeyValueOfstringanyType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RunSteamUpdate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RunSteamUpdateResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="RunSteamUpdateResult" type="q2:Results" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="InstallMagma">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="InstallMagmaResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="InstallMagmaResult" type="q3:Results" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IsMagmaInstalled">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IsMagmaInstalledResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="IsMagmaInstalledResult" type="q4:MagmaResults" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UninstallMagma">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UninstallMagmaResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="UninstallMagmaResult" type="q5:Results" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChangeFtpPass">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="newPass" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChangeFtpPassResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="ChangeFtpPassResult" type="q6:Results" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ToggleCheatpunch">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="action" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ToggleCheatpunchResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="ToggleCheatpunchResult" type="q7:CheatpunchResults" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetConfigValue">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="value" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetConfigValueResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="GetConfigValueResult" type="q8:ConfigResults" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetConfigValue">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="value" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetConfigValueResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="SetConfigValueResult" type="q9:Results" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ServerStatus">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ServerStatusResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="ServerStatusResult" type="q10:ServiceResults" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="StartServer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="StartServerResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="StartServerResult" type="q11:Results" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="StopServer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="StopServerResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="StopServerResult" type="q12:Results" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RestartServer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RestartServerResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="RestartServerResult" type="q13:Results" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UninstallRustServer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ident" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UninstallRustServerResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/Rust" minOccurs="0" name="UninstallRustServerResult" type="q14:Results" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

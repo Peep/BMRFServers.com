@@ -417,7 +417,7 @@ namespace Rust
         {
             InitializeConfigurationFile();
             string configPath = Path.Combine(cfg.InstallPath, ident, "save\\myserverdata\\cfg\\server.cfg");
-
+        
             if (!File.Exists(configPath))
                 return new ConfigResults { Success = false, Message = "Config file not found. Either the file is missing or the user doesn't exist." };
 
@@ -427,6 +427,7 @@ namespace Rust
             foreach (var line in configFile)
             {
                 var splitValues = line.Split(new char[] {' '}, 2);
+                splitValues[1] = splitValues[1].Trim('"');
                 if (value == "all")
                     dic.Add(splitValues[0], splitValues[1]);
                 else if (splitValues[0] == value)
@@ -449,6 +450,15 @@ namespace Rust
                 if (!File.Exists(configPath))
                     return new Results { Success = false, Message = "Config file not found. Either the file is missing or the user doesn't exist." };
 
+                bool useDoubleQuotes = true;
+                if (String.Equals(value, "true", StringComparison.CurrentCultureIgnoreCase) || String.Equals(value, "false", StringComparison.CurrentCultureIgnoreCase))
+                    useDoubleQuotes = false;
+
+                long parsedResult;
+                bool canConvert = long.TryParse(value, out parsedResult);
+                if (canConvert)
+                    useDoubleQuotes = false;
+
                 var configFile = File.ReadAllLines(configPath);
 
                 for (int i = 0; i < configFile.Length; i++)
@@ -457,7 +467,10 @@ namespace Rust
                     if (splitValues[0] == key) // If the specified key exists, update it's value, write, and return.
                     {
                         splitValues[1] = value;
-                        configFile[i] = String.Format(@"{0} ""{1}""", splitValues[0], splitValues[1]);
+                        if (useDoubleQuotes)
+                            configFile[i] = String.Format(@"{0} ""{1}""", splitValues[0], splitValues[1]);
+                        else
+                            configFile[i] = String.Format(@"{0} {1}", splitValues[0], splitValues[1]);
                         File.WriteAllLines(configPath, configFile);
                         return new Results { Success = true, Message = "The existing config value was updated." };
                     }
