@@ -19,6 +19,8 @@ namespace Rust
         public string FusionPath = @"C:\Program Files\FireDaemon Fusion";
         [Field("Filezilla Path")]
         public string FileZillaPath = @"D:\Development\FileZilla";
+        [Field("Network Interface Controller")]
+        public string Nic = "Intel[R] 82579LM Gigabit Network Connection";
         [Field("Rust Path", "Customer Settings")]
         public string InstallPath = @"D:\Test";
         [Field("Config Location")]

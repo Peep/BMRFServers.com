@@ -3,16 +3,17 @@ using System.Net;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Management;
 using System.ServiceProcess;
 using EasyConfigLib;
-using SourceRcon;
+using Rust;
 
-namespace Rust
+namespace SourceRcon
 {
-    class RconClient
+    public class RconClient
     {
         public Config cfg;
         private IPAddress localhost = IPAddress.Parse("127.0.0.1");
@@ -36,9 +37,27 @@ namespace Rust
             this.password = GetRconPassword();
         }
 
-        int GetServerPort()
+        public Queue<string> ExecuteCommand(string cmd)
         {
-            string serviceDesc; 
+            var consoleOutput = new Queue<string>();
+            SourceRcon rcon = new SourceRcon();
+            rcon.ServerOutput += new StringOutput(consoleOutput.Enqueue);
+
+            if (rcon.Connect(new IPEndPoint(this.localhost, this.port), this.password))
+            {
+                while (!rcon.Connected)
+                    Thread.Sleep(10);
+
+                rcon.ServerCommand(cmd);
+                Thread.Sleep(100);
+                return consoleOutput;
+            }
+            throw new Exception("Command did not execute successfully.");
+        }
+
+        private int GetServerPort()
+        {
+            string serviceDesc;
 
             ServiceController ctl = ServiceController.GetServices().FirstOrDefault
                         (s => s.ServiceName == String.Format("Rust - {0}", Identifier));
@@ -48,13 +67,14 @@ namespace Rust
 
             if (serviceDesc != null)
             {
-                port = int.Parse(serviceDesc.Substring(serviceDesc.IndexOf("- ")));
+                port = int.Parse(serviceDesc.Substring(serviceDesc.IndexOf("-") + 1));
+                port++;
                 return port;
             }
             throw new Exception(String.Format("Unable to parse port from {0}'s service description. Check the service description", Identifier));
         }
 
-        public string GetRconPassword()
+        private string GetRconPassword()
         {
             string configPath = Path.Combine(cfg.InstallPath, Identifier, "save\\myserverdata\\cfg\\server.cfg");
 

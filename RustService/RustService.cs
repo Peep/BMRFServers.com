@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.ServiceProcess;
 using System.Xml.Linq;
+using SourceRcon;
 
 namespace Rust 
 {
@@ -235,7 +236,7 @@ namespace Rust
 
             StartServer(ident);
 
-            return new Results { Success = true, Message = "Your Rust server has been updated successfully." };
+            return new Results { Success = true, Message = "Your server has been updated successfully." };
         }
 
         public Results InstallMagma(string ident)
@@ -257,7 +258,7 @@ namespace Rust
                 CopyDirectory(Path.Combine(cfg.AppPath, "magma\\save"),
                               Path.Combine(cfg.InstallPath, ident, "save"));
 
-                return new Results { Success = true, Message = "The operation completed successfully." };
+                return new Results { Success = true, Message = "Magma was installed successfully." };
             }
             catch (Exception e)
             {
@@ -275,9 +276,9 @@ namespace Rust
                     if (File.Exists(Path.Combine(cfg.InstallPath, ident, libFolder, "Mono.Cecil.dll")))
                         if (Directory.Exists(Path.Combine(cfg.InstallPath, ident, "save\\Magma")))
                         {
-                            return new MagmaResults { Success = true, Installed = true, Message = String.Format("All core Magma files were found on {0}'s server.", ident) };
+                            return new MagmaResults { Success = true, Installed = true, Message = "Magma is installed on your server." };
                         }
-            return new MagmaResults { Success = true, Installed = false, Message = String.Format("One or more core Magma files were missing on {0}'s server.", ident) };
+            return new MagmaResults { Success = true, Installed = false, Message = "Magma is not installed on your server." };
         }
 
         public Results UninstallMagma(string ident)
@@ -295,7 +296,7 @@ namespace Rust
                 File.Delete(Path.Combine(cfg.InstallPath, ident, libFolder, "Magma.dll"));
                 File.Delete(Path.Combine(cfg.InstallPath, ident, libFolder, "Mono.Cecil.dll"));
 
-                return new Results { Success = true, Message = String.Format("Magma was successfully uninstalled from {0}'s server", ident) };
+                return new Results { Success = true, Message = "Magma was successfully uninstalled from your server" };
             }
             catch (Exception e)
             {
@@ -320,11 +321,11 @@ namespace Rust
                 xDoc.Save(Path.Combine(cfg.FileZillaPath, "FileZilla Server.xml"));
                 Process.Start(Path.Combine(cfg.FileZillaPath, "FileZilla Server.exe"), "/reload-config");
 
-                return new Results { Success = true, Message = "The password was changed successfully." };
+                return new Results { Success = true, Message = "Your FTP password was changed successfully." };
             }
             else
             {
-                return new Results { Success = false, Message = "The specified user was not found on this machine." };
+                return new Results { Success = false, Message = "Couldn't find your FTP account, please contact support." };
             }
         }
 
@@ -335,7 +336,7 @@ namespace Rust
             string xmlPath = Path.Combine(cfg.AppPath, String.Format("export\\{0}_export.xml", ident));
 
             if (action < 0 || action > 2)
-                return new CheatpunchResults { Success = false, Message = "This method was not called properly, action must be between 0 and 2." };
+                return new CheatpunchResults { Success = false, Message = "Error toggling cheatpunch in a way that should never happen, please contact support." };
 
             try
             {
@@ -399,7 +400,7 @@ namespace Rust
                     }
                 }
 
-                return new CheatpunchResults { Success = false, Message = "No clauses were satisfied. Does the user exist?" };
+                return new CheatpunchResults { Success = false, Message = "Error toggling Cheatpunch, please contact support." };
             }
             catch (Exception e)
             {
@@ -418,7 +419,7 @@ namespace Rust
             string configPath = Path.Combine(cfg.InstallPath, ident, "save\\myserverdata\\cfg\\server.cfg");
         
             if (!File.Exists(configPath))
-                return new ConfigResults { Success = false, Message = "Config file not found. Either the file is missing or the user doesn't exist." };
+                return new ConfigResults { Success = false, Message = "Your configuration file was not found, does it exist?" };
 
             var configFile = File.ReadAllLines(configPath);
             var dic = new Dictionary<string, string>();
@@ -459,10 +460,11 @@ namespace Rust
                     useDoubleQuotes = false;
 
                 var configFile = File.ReadAllLines(configPath);
+                string[] splitValues = null;
 
                 for (int i = 0; i < configFile.Length; i++)
                 {
-                    var splitValues = configFile[i].Split(new char[] { ' ' }, 2); // Separate the key and value using a space.
+                    splitValues = configFile[i].Split(new char[] { ' ' }, 2); // Separate the key and value using a space.
                     if (splitValues[0] == key) // If the specified key exists, update it's value, write, and return.
                     {
                         splitValues[1] = value;
@@ -478,12 +480,26 @@ namespace Rust
                 using (var writer = new StreamWriter(configPath, true)) // If we haven't returned yet, assume the value doesn't exist and write it as a new line.
                     writer.WriteLine(String.Format(@"{0} ""{1}""", key, value));
 
-                return new Results { Success = true, Message = "The specified config value was added to the config file" };
+                return new Results { Success = true, Message = String.Format("{0} has been set to {1}", splitValues[0], splitValues[1]) };
             }
             catch (Exception e)
             {
                 WriteToEventLog(e.ToString(), EventLogEntryType.Error);
                 return new Results { Success = false, Message = "An error occurred while trying to write to your config file, please contact support." };
+            }
+        }
+
+        public string RunRconCommand(string ident, string cmd)
+        {
+            try
+            {
+                var rcon = new RconClient(ident);
+                var result = rcon.ExecuteCommand(cmd);
+                return result.Dequeue();
+            }
+            catch (Exception e)
+            {
+                return e.Message;
             }
         }
 
@@ -499,7 +515,7 @@ namespace Rust
                 return new ServiceResults { Success = false, Message = "Unable to find a server associated with your account, please contact support." };
             }
             string status = ctl.Status.ToString();
-            return new ServiceResults { Success = true, Status = status, Message = "Your Rust server is " + status };
+            return new ServiceResults { Success = true, Status = status, Message = "Your Rust server is " + status + "." };
         }
 
         public Results StartServer(string ident)
@@ -517,7 +533,7 @@ namespace Rust
                 }
 
                 if (ctl.Status == ServiceControllerStatus.Running)
-                    return new Results { Success = true, Message = "Your Rust server is already running." };
+                    return new Results { Success = true, Message = "Your server is already running." };
 
                 ctl.Start();
                 ctl.WaitForStatus(ServiceControllerStatus.Running, new TimeSpan(0, 0, 5));
@@ -527,22 +543,28 @@ namespace Rust
                     WriteToEventLog(String.Format("Server assigned to '{0}' has been started successfully.",
                                         ident), EventLogEntryType.SuccessAudit);
                     return new Results
-                    { Success = true, Message = "Your Rust server has been started." };
+                    { Success = true, Message = "Your server has been started." };
                 }
                 else
-                    return new Results { Success = false, Message = "Timed out while attempting to start your Rust server, please contact support." };
+                    return new Results { Success = false, Message = "Timed out while attempting to start your server, please contact support." };
             }
             catch (Exception e)
             {
                 WriteToEventLog(e.ToString(), EventLogEntryType.Error);
-                return new Results { Success = false, Message = "An error occured while attempting to start your Rust server, please contact support." };
+                return new Results { Success = false, Message = "An error occured while attempting to start your server, please contact support." };
             }
         }
 
         public Results StopServer(string ident)
         {
+            bool wasSaved = false;
             try
             {
+                string result = RunRconCommand(ident, "save.all");
+                if (result.StartsWith("Saving"))
+                    wasSaved = true;
+
+
                 ServiceController ctl = ServiceController.GetServices().FirstOrDefault
                         (s => s.ServiceName == String.Format("Rust - {0}", ident));
 
@@ -554,7 +576,7 @@ namespace Rust
                 }
 
                 if (ctl.Status == ServiceControllerStatus.Stopped)
-                    return new Results { Success = true, Message = "Your Rust server is already stopped." };
+                    return new Results { Success = true, Message = "Your server is already stopped." };
 
                 ctl.Stop();
                 ctl.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 5));
@@ -563,11 +585,15 @@ namespace Rust
                 {
                     WriteToEventLog(String.Format("Server assigned to '{0}' has been stopped successfully.",
                                        ident), EventLogEntryType.SuccessAudit);
-                    return new Results { Success = true, Message = "Your Rust server has been stopped." };
+                    if (wasSaved)
+                        return new Results { Success = true, Message = "Your server data has been saved, and the server is now stopped." };
+                    else
+                        return new Results { Success = true, Message = "Your server has been stopped." };
+
                 }
                 else
                 {
-                    return new Results {Success = false, Message = "Timed out while attempting to stop your Rust server, please contact support." };
+                    return new Results {Success = false, Message = "Timed out while attempting to stop your server, please contact support." };
                 }
             }
             catch (Exception e)
@@ -579,6 +605,8 @@ namespace Rust
 
         public Results RestartServer(string ident)
         {
+            string stopMessage = null;
+
             try
             {
                 ServiceController ctl = ServiceController.GetServices().FirstOrDefault
@@ -587,6 +615,7 @@ namespace Rust
                 if (ctl.Status == ServiceControllerStatus.Running)
                 {
                     var stop = StopServer(ident);
+                    stopMessage = stop.Message;
                     ctl.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 5));
 
                     if (!stop.Success)
@@ -598,14 +627,55 @@ namespace Rust
 
                 if (!start.Success)
                     return new Results { Success = false, Message = start.Message };
-                
-                return new Results { Success = true, Message = "Your Rust server has been restarted successfully." };
+
+                if (stopMessage.Contains("saved"))
+                    return new Results { Success = true, Message = "Your server data has been saved saved, and the server restarted successfully." };
+                else
+                    return new Results { Success = true, Message = "The server restarted successfully." };
             }
             catch (Exception e)
             {
                 WriteToEventLog(e.ToString(), EventLogEntryType.Error);
                 return new Results { Success = false, Message = "An error occured while attempting to restart your Rust server, please contact support." };
             }
+        }
+
+        public ResourceResults GetResourceValues()
+        {
+            InitializeConfigurationFile();
+            string networkCard = cfg.Nic;
+
+            PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+            PerformanceCounter memCounter = new PerformanceCounter("Memory", "Available MBytes");
+
+            PerformanceCounter bandwidthCounter = new PerformanceCounter("Network Interface", "Current Bandwidth", networkCard);
+            PerformanceCounter dataSentCounter = new PerformanceCounter("Network Interface", "Bytes Sent/sec", networkCard);
+            PerformanceCounter dataReceivedCounter = new PerformanceCounter("Network Interface", "Bytes Received/sec", networkCard);
+
+            const int totalRAM = 32768;
+
+            cpuCounter.NextValue();
+            memCounter.NextValue();
+            dataSentCounter.NextValue();
+            dataReceivedCounter.NextValue();
+            bandwidthCounter.NextValue();
+
+            System.Threading.Thread.Sleep(1000); // make sure Windows has updated the counters
+
+            int cpuUsage = (int)cpuCounter.NextValue() / 2; // dividing this by 2 seems to pull the accurate result, hyperthreading?
+            float availableMem = memCounter.NextValue();
+
+            float memUsage = (1 - (availableMem / (float)totalRAM)) * 100;
+
+            float bandwidth = bandwidthCounter.NextValue();
+            float send = dataSentCounter.NextValue();
+            float receive = dataReceivedCounter.NextValue();
+
+            float utilization = (8 * (send + receive)) / bandwidth * 100;
+
+            int netUsage = (int)utilization;
+
+            return new ResourceResults { CpuUsage = cpuUsage, RamUsage = (int)memUsage, NetUsage = netUsage };
         }
 
         static string GeneratePassword() 

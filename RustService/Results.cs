@@ -49,4 +49,11 @@ namespace Rust
 
         public bool Installed { get; set; }
     }
+
+    public struct ResourceResults
+    {
+        public int CpuUsage { get; set; }
+        public int RamUsage { get; set; }
+        public int NetUsage { get; set; }
+    }
 }

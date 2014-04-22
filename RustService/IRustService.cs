@@ -78,6 +78,13 @@ namespace Rust
         [WebInvoke(Method = "GET",
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "RunRconCommand?ident={ident}&cmd={cmd}")]
+        string RunRconCommand(string ident, string cmd);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "ServerStatus?ident={ident}")]
         ServiceResults ServerStatus(string ident);
 
@@ -108,5 +115,12 @@ namespace Rust
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "UninstallRustServer?ident={ident}")]
         Results UninstallRustServer(string ident);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "GetResourceValues")]
+        ResourceResults GetResourceValues();
     }
 }
