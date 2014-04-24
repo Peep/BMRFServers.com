@@ -12,8 +12,10 @@ using System.Security.Cryptography;
 /// characters in the first position).
 /// </summary>
 
-namespace Rust {
-    public class RandomPassword {
+namespace Rust
+{
+    public class RandomPassword
+    {
         // Define default min and max password lengths.
         private static int DEFAULT_MIN_PASSWORD_LENGTH = 8;
         private static int DEFAULT_MAX_PASSWORD_LENGTH = 10;
@@ -26,53 +28,56 @@ namespace Rust {
         private static string PASSWORD_CHARS_SPECIAL = "1";
 
         /// <summary>
-        /// Generates a random password.
+        ///     Generates a random password.
         /// </summary>
         /// <returns>
-        /// Randomly generated password.
+        ///     Randomly generated password.
         /// </returns>
         /// <remarks>
-        /// The length of the generated password will be determined at
-        /// random. It will be no shorter than the minimum default and
-        /// no longer than maximum default.
+        ///     The length of the generated password will be determined at
+        ///     random. It will be no shorter than the minimum default and
+        ///     no longer than maximum default.
         /// </remarks>
-        public static string Generate() {
+        public static string Generate()
+        {
             return Generate(DEFAULT_MIN_PASSWORD_LENGTH,
-                            DEFAULT_MAX_PASSWORD_LENGTH);
+                DEFAULT_MAX_PASSWORD_LENGTH);
         }
 
         /// <summary>
-        /// Generates a random password of the exact length.
+        ///     Generates a random password of the exact length.
         /// </summary>
         /// <param name="length">
-        /// Exact password length.
+        ///     Exact password length.
         /// </param>
         /// <returns>
-        /// Randomly generated password.
+        ///     Randomly generated password.
         /// </returns>
-        public static string Generate(int length) {
+        public static string Generate(int length)
+        {
             return Generate(length, length);
         }
 
         /// <summary>
-        /// Generates a random password.
+        ///     Generates a random password.
         /// </summary>
         /// <param name="minLength">
-        /// Minimum password length.
+        ///     Minimum password length.
         /// </param>
         /// <param name="maxLength">
-        /// Maximum password length.
+        ///     Maximum password length.
         /// </param>
         /// <returns>
-        /// Randomly generated password.
+        ///     Randomly generated password.
         /// </returns>
         /// <remarks>
-        /// The length of the generated password will be determined at
-        /// random and it will fall with the range determined by the
-        /// function parameters.
+        ///     The length of the generated password will be determined at
+        ///     random and it will fall with the range determined by the
+        ///     function parameters.
         /// </remarks>
         public static string Generate(int minLength,
-                                      int maxLength) {
+            int maxLength)
+        {
             // Make sure that input parameters are valid.
             if (minLength <= 0 || maxLength <= 0 || minLength > maxLength)
                 return null;
@@ -80,24 +85,24 @@ namespace Rust {
             // Create a local array containing supported password characters
             // grouped by types. You can remove character groups from this
             // array, but doing so will weaken the password strength.
-            char[][] charGroups = new char[][] 
-        {
-            PASSWORD_CHARS_LCASE.ToCharArray(),
-            PASSWORD_CHARS_UCASE.ToCharArray(),
-            PASSWORD_CHARS_NUMERIC.ToCharArray(),
-            PASSWORD_CHARS_SPECIAL.ToCharArray()
-        };
+            char[][] charGroups =
+            {
+                PASSWORD_CHARS_LCASE.ToCharArray(),
+                PASSWORD_CHARS_UCASE.ToCharArray(),
+                PASSWORD_CHARS_NUMERIC.ToCharArray(),
+                PASSWORD_CHARS_SPECIAL.ToCharArray()
+            };
 
             // Use this array to track the number of unused characters in each
             // character group.
-            int[] charsLeftInGroup = new int[charGroups.Length];
+            var charsLeftInGroup = new int[charGroups.Length];
 
             // Initially, all characters in each group are not used.
             for (int i = 0; i < charsLeftInGroup.Length; i++)
                 charsLeftInGroup[i] = charGroups[i].Length;
 
             // Use this array to track (iterate through) unused character groups.
-            int[] leftGroupsOrder = new int[charGroups.Length];
+            var leftGroupsOrder = new int[charGroups.Length];
 
             // Initially, all character groups are not used.
             for (int i = 0; i < leftGroupsOrder.Length; i++)
@@ -110,20 +115,20 @@ namespace Rust {
 
             // Use a 4-byte array to fill it with random bytes and convert it then
             // to an integer value.
-            byte[] randomBytes = new byte[4];
+            var randomBytes = new byte[4];
 
             // Generate 4 random bytes.
-            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+            var rng = new RNGCryptoServiceProvider();
             rng.GetBytes(randomBytes);
 
             // Convert 4 bytes into a 32-bit integer value.
             int seed = (randomBytes[0] & 0x7f) << 24 |
-                        randomBytes[1] << 16 |
-                        randomBytes[2] << 8 |
-                        randomBytes[3];
+                       randomBytes[1] << 16 |
+                       randomBytes[2] << 8 |
+                       randomBytes[3];
 
             // Now, this is real randomization.
-            Random random = new Random(seed);
+            var random = new Random(seed);
 
             // This array will hold password characters.
             char[] password = null;
@@ -150,7 +155,8 @@ namespace Rust {
             int lastLeftGroupsOrderIdx = leftGroupsOrder.Length - 1;
 
             // Generate password characters one at a time.
-            for (int i = 0; i < password.Length; i++) {
+            for (int i = 0; i < password.Length; i++)
+            {
                 // If only one character group remained unprocessed, process it;
                 // otherwise, pick a random character group from the unprocessed
                 // group list. To allow a special character to appear in the
@@ -160,7 +166,7 @@ namespace Rust {
                     nextLeftGroupsOrderIdx = 0;
                 else
                     nextLeftGroupsOrderIdx = random.Next(0,
-                                                         lastLeftGroupsOrderIdx);
+                        lastLeftGroupsOrderIdx);
 
                 // Get the actual index of the character group, from which we will
                 // pick the next character.
@@ -182,16 +188,18 @@ namespace Rust {
                 // If we processed the last character in this group, start over.
                 if (lastCharIdx == 0)
                     charsLeftInGroup[nextGroupIdx] =
-                                              charGroups[nextGroupIdx].Length;
-                // There are more unprocessed characters left.
-                else {
+                        charGroups[nextGroupIdx].Length;
+                    // There are more unprocessed characters left.
+                else
+                {
                     // Swap processed character with the last unprocessed character
                     // so that we don't pick it until we process all characters in
                     // this group.
-                    if (lastCharIdx != nextCharIdx) {
+                    if (lastCharIdx != nextCharIdx)
+                    {
                         char temp = charGroups[nextGroupIdx][lastCharIdx];
                         charGroups[nextGroupIdx][lastCharIdx] =
-                                    charGroups[nextGroupIdx][nextCharIdx];
+                            charGroups[nextGroupIdx][nextCharIdx];
                         charGroups[nextGroupIdx][nextCharIdx] = temp;
                     }
                     // Decrement the number of unprocessed characters in
@@ -202,14 +210,16 @@ namespace Rust {
                 // If we processed the last group, start all over.
                 if (lastLeftGroupsOrderIdx == 0)
                     lastLeftGroupsOrderIdx = leftGroupsOrder.Length - 1;
-                // There are more unprocessed groups left.
-                else {
+                    // There are more unprocessed groups left.
+                else
+                {
                     // Swap processed group with the last unprocessed group
                     // so that we don't pick it until we process all groups.
-                    if (lastLeftGroupsOrderIdx != nextLeftGroupsOrderIdx) {
+                    if (lastLeftGroupsOrderIdx != nextLeftGroupsOrderIdx)
+                    {
                         int temp = leftGroupsOrder[lastLeftGroupsOrderIdx];
                         leftGroupsOrder[lastLeftGroupsOrderIdx] =
-                                    leftGroupsOrder[nextLeftGroupsOrderIdx];
+                            leftGroupsOrder[nextLeftGroupsOrderIdx];
                         leftGroupsOrder[nextLeftGroupsOrderIdx] = temp;
                     }
                     // Decrement the number of unprocessed groups.

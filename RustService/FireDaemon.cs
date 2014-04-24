@@ -1,43 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-using System.Text;
-using System.IO;
-using System.Threading.Tasks;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.ServiceProcess;
+using System.Xml.Linq;
 
-namespace Rust 
+namespace Rust
 {
-    public class FireDaemon 
+    public class FireDaemon
     {
-        Config cfg;
-        string ident;
-        int slots;
-        int port;
+        private readonly Config _cfg;
+        private readonly string _ident;
+        private readonly int _slots;
+        private int _port;
 
-        public FireDaemon(Config config, string identifier, int slots) 
+        public FireDaemon(Config config, string identifier, int slots)
         {
-            this.cfg = config;
-            this.ident = identifier;
-            this.slots = slots;
+            _cfg = config;
+            _ident = identifier;
+            _slots = slots;
         }
 
-        public void WriteXml(XDocument xml, string filename) 
+        public void WriteXml(XDocument xml, string filename)
         {
-            try 
+            try
             {
-                if (!Directory.Exists(String.Format(@"{0}\xml", cfg.AppPath)))
+                if (!Directory.Exists(String.Format(@"{0}\xml", _cfg.AppPath)))
                 {
-                    Directory.CreateDirectory(String.Format(@"{0}\xml", cfg.AppPath));
+                    Directory.CreateDirectory(String.Format(@"{0}\xml", _cfg.AppPath));
                 }
 
-                xml.Save(String.Format(@"{0}\xml\{1}.xml", cfg.AppPath, filename));
+                xml.Save(String.Format(@"{0}\xml\{1}.xml", _cfg.AppPath, filename));
                 InstallService();
-
-            } 
-            catch (Exception e) 
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
                 DeploymentResults.ExceptionThrown = true;
@@ -47,22 +44,22 @@ namespace Rust
 
         // I really don't like this method of deciding whether a port is valid,
         // should probably come up with something different in the future.
-        public int GetValidPort() 
+        public int GetValidPort()
         {
-            try 
+            try
             {
                 bool validPort = false;
                 int port = 28015;
 
-                if (!File.Exists(String.Format(@"{0}\ports.cfg", cfg.AppPath)))
+                if (!File.Exists(String.Format(@"{0}\ports.cfg", _cfg.AppPath)))
                 {
-                    File.Create(String.Format(@"{0}\ports.cfg", cfg.AppPath));
+                    File.Create(String.Format(@"{0}\ports.cfg", _cfg.AppPath));
                 }
 
-                List<string> parseFile = File.ReadLines(String.Format(@"{0}\ports.cfg", cfg.AppPath)).ToList();
-                var ports = parseFile.Select(int.Parse).ToList();
+                List<string> parseFile = File.ReadLines(String.Format(@"{0}\ports.cfg", _cfg.AppPath)).ToList();
+                List<int> ports = parseFile.Select(int.Parse).ToList();
 
-                while (!validPort) 
+                while (!validPort)
                 {
                     if (ports.Contains(port))
                     {
@@ -74,33 +71,35 @@ namespace Rust
                     }
                 }
 
-                this.port = port;
-
-            } 
-            catch (Exception e) 
+                _port = port;
+            }
+            catch (Exception e)
             {
                 DeploymentResults.ExceptionThrown = true;
                 DeploymentResults.Exceptions.Add(e);
             }
 
-            return this.port;
+            return _port;
         }
 
-        public void InstallService() 
+        public void InstallService()
         {
-            try 
+            try
             {
                 Logger.Log("Installing FireDaemon Service");
                 Console.WriteLine("Installing FireDaemon Service");
 
-                Process fd = new Process();
-
-                fd.StartInfo.FileName = String.Format(@"{0}\FireDaemon.exe", cfg.FDPath);
-                fd.StartInfo.UseShellExecute = false;
-                fd.StartInfo.Arguments = String.Format(@"--import-all {0}\xml\*.xml", cfg.AppPath);
-
-                fd.StartInfo.RedirectStandardOutput = true;
-                fd.StartInfo.RedirectStandardError = true;
+                var fd = new Process
+                {
+                    StartInfo =
+                    {
+                        FileName = String.Format(@"{0}\FireDaemon.exe", _cfg.FDPath),
+                        UseShellExecute = false,
+                        Arguments = String.Format(@"--import-all {0}\xml\*.xml", _cfg.AppPath),
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true
+                    }
+                };
 
                 fd.Start();
 
@@ -111,46 +110,50 @@ namespace Rust
                 Logger.Log(output);
 
                 fd.WaitForExit();
-            } 
-            catch (Exception e) 
+            }
+            catch (Exception e)
             {
                 Logger.Log(e.ToString());
             }
 
             ServiceController ctl = ServiceController.GetServices()
-                .FirstOrDefault(s => s.ServiceName == String.Format("Rust - {0}", ident));
+                .FirstOrDefault(s => s.ServiceName == String.Format("Rust - {0}", _ident));
 
-            if (ctl == null) 
+            if (ctl == null)
             {
                 Logger.Log("FireDaemon Service installation failed!");
-            } 
+            }
 
-            else 
+            else
             {
-                Logger.Log(String.Format("{0}'s Rust Server is {1}", ident, ctl.Status));
-                using (StreamWriter writer = new StreamWriter(String.Format(@"{0}\ports.cfg", cfg.AppPath), true))
-                    writer.WriteLine(port);
+                Logger.Log(String.Format("{0}'s Rust Server is {1}", _ident, ctl.Status));
+                using (var writer = new StreamWriter(String.Format(@"{0}\ports.cfg", _cfg.AppPath), true))
+                    writer.WriteLine(_port);
 
-                DeploymentResults.Port = port;
+                DeploymentResults.Port = _port;
             }
         }
 
-        public void GenerateXml() {
+        public void GenerateXml()
+        {
             int port = GetValidPort();
 
-            XDocument service = new XDocument(
+            var service = new XDocument(
                 new XElement("Service",
                     new XElement("Program",
-                        new XElement("Name", String.Format("Rust - {0}", ident)),
-                        new XElement("DisplayName", String.Format("Rust - {0}", ident)),
+                        new XElement("Name", String.Format("Rust - {0}", _ident)),
+                        new XElement("DisplayName", String.Format("Rust - {0}", _ident)),
                         new XElement("Description", String.Format("Port - {0}", port)),
-                        new XElement("WorkingDir", String.Format(@"{0}\{1}", cfg.InstallPath, ident)),
-                        new XElement("Executable", String.Format(@"{0}\{1}\rust_server.exe", cfg.InstallPath, ident)),
-                        new XElement("Parameters", String.Format(@"-batchmode -maxplayers ""{0}"" -port {1} -datadir ""save/myserverdata/"" -cfg ""{2}\server.cfg""", slots, port, cfg.CfgDir)),
+                        new XElement("WorkingDir", String.Format(@"{0}\{1}", _cfg.InstallPath, _ident)),
+                        new XElement("Executable", String.Format(@"{0}\{1}\rust_server.exe", _cfg.InstallPath, _ident)),
+                        new XElement("Parameters",
+                            String.Format(
+                                @"-batchmode -maxplayers ""{0}"" -port {1} -datadir ""save/myserverdata/"" -cfg ""{2}\server.cfg""",
+                                _slots, port, _cfg.CfgDir)),
                         new XElement("Delay", "3000"),
                         new XElement("StartUpMode", "1"),
                         new XElement("ForceReplace", "true")
-                    ),
+                        ),
                     new XElement("Options",
                         new XElement("AffinityMask", "0"),
                         new XElement("Priority", "0"),
@@ -170,8 +173,8 @@ namespace Rust
                         new XElement("ShowWindow", "0"),
                         new XElement("JobType", "0"),
                         new XElement("IgnoreFlags", "3")
-                    ),
-                //new XElement("Logon", new XElement("AccountName", @".\rust")),
+                        ),
+                    //new XElement("Logon", new XElement("AccountName", @".\rust")),
                     new XElement("SMF", new XElement("SMFEnabled", "true"), new XElement("SMFFrequency", "5000")),
                     new XElement("Scheduling",
                         new XElement("StartTime", "00:00:00"),
@@ -183,14 +186,14 @@ namespace Rust
                         new XElement("RestartEvery", "60"),
                         new XElement("RestartDelay", "0"),
                         new XElement("RestartTime", "00:00:00")
-                    ),
+                        ),
                     new XElement("DlgResponder",
                         new XElement("Enabled", "false"),
                         new XElement("CloseAll", "false"),
                         new XElement("CheckFrequency", "5000"),
                         new XElement("IgnoreUnknowns", "true"),
                         new XElement("Responses")
-                    ),
+                        ),
                     new XElement("Recovery",
                         new XElement("FirstFailure", "0"),
                         new XElement("SecondFailure", "0"),
@@ -204,97 +207,10 @@ namespace Rust
                         new XElement("EnableActionsForStopWithErrors", "false"),
                         new XElement("SendMsg", "false"),
                         new XElement("RebootMsg")
+                        )
                     )
-                )
-            );
-
-            //XDocument updater = new XDocument(
-            //    new XElement("Service",
-            //        new XElement("Program",
-            //            new XElement("Name", String.Format("Rust - {0} Update", ident)),
-            //            new XElement("DisplayName", String.Format("Rust - {0} Update", ident)),
-            //            new XElement("Description", "Updates server. Turn off server before running. Let this run for 60 seconds."),
-            //            new XElement("WorkingDir", cfg.SteamPath),
-            //            new XElement("Executable", String.Format(@"{0}\steamcmd.exe", cfg.SteamPath)),
-            //            new XElement("Parameters", String.Format(@"+runscript {0}\scripts\{1}.txt", cfg.AppPath, ident)),
-            //            new XElement("Delay", "3000"),
-            //            new XElement("StartUpMode", "0"),
-            //            new XElement("ForceReplace", "true")
-            //        ),
-            //        new XElement("Options",
-            //            new XElement("AffinityMask", "0"),
-            //            new XElement("Priority", "0"),
-            //            new XElement("AppendLogs", "true"),
-            //            new XElement("EventLogging", "true"),
-            //            new XElement("InteractWithDesktop", "true"),
-            //            new XElement("PreLaunchDelay", "0"),
-            //            new XElement("ConsoleApp", "false"),
-            //            new XElement("CtrlC", "0"),
-            //            new XElement("UponExit", "0"),
-            //            new XElement("UponFlap", "0"),
-            //            new XElement("FlapCount", "0"),
-            //            new XElement("UponFail", "0"),
-            //            new XElement("FailCount", "0"),
-            //            new XElement("ShutdownDelay", "5000"),
-            //            new XElement("PreShutdown", "0"),
-            //            new XElement("PreShutdownDelay", "180000"),
-            //            new XElement("ShowWindow", "0"),
-            //            new XElement("JobType", "0"),
-            //            new XElement("IgnoreFlags", "3")
-            //        ),
-            //        new XElement("SMF", new XElement("SMFEnabled", "true"), new XElement("SMFFrequency", "5000")),
-            //        new XElement("Scheduling",
-            //            new XElement("StartTime", "00:00:00"),
-            //            new XElement("EndTime", "00:00:00"),
-            //            new XElement("RunDays", "127"),
-            //            new XElement("MonthFrom", "0"),
-            //            new XElement("MonthTo", "0"),
-            //            new XElement("RestartFreq", "0"),
-            //            new XElement("RestartEvery", "60"),
-            //            new XElement("RestartDelay", "0"),
-            //            new XElement("RestartTime", "00:00:00")
-            //        ),
-            //        new XElement("PreService",
-            //            new XElement("PreWorkingDir", String.Format(@"{0}\scripts", cfg.AppPath)),
-            //            new XElement("PreExecutable", String.Format(@"{0}\scripts\stopservice.bat", cfg.AppPath)),
-            //            new XElement("PreEventOrder", "1"),
-            //            new XElement("PreDeatched", "1"),
-            //            new XElement("PreParameters", String.Format(@"""Rust - {0}""", ident)),
-            //            new XElement("PreDelay", "3000")
-            //        ),
-            //        new XElement("PostService",
-            //            new XElement("PostWorkingDir", String.Format(@"{0}\scripts", cfg.AppPath)),
-            //            new XElement("PostExecutable", String.Format(@"{0}\scripts\stopservice.bat", cfg.AppPath)),
-            //            new XElement("PostEventOrder", "2"),
-            //            new XElement("PostDeatched", "1"),
-            //            new XElement("PostParameters", String.Format(@"""Rust - {0} Update""", ident)),
-            //            new XElement("PostDelay", "3000")
-            //        ),
-            //        new XElement("DlgResponder",
-            //            new XElement("Enabled", "false"),
-            //            new XElement("CloseAll", "false"),
-            //            new XElement("CheckFrequency", "5000"),
-            //            new XElement("IgnoreUnknowns", "true"),
-            //            new XElement("Responses")
-            //        ),
-            //        new XElement("Recovery",
-            //            new XElement("FirstFailure", "0"),
-            //            new XElement("SecondFailure", "0"),
-            //            new XElement("Subsequent", "0"),
-            //            new XElement("ResetFailCountAfter", "0"),
-            //            new XElement("RestartServiceDelay", "0"),
-            //            new XElement("RestartComputerDelay", "0"),
-            //            new XElement("Program"),
-            //            new XElement("CommandLineParams"),
-            //            new XElement("AppendFailCount", "false"),
-            //            new XElement("EnableActionsForStopWithErrors", "false"),
-            //            new XElement("SendMsg", "false"),
-            //            new XElement("RebootMsg")
-            //        )
-            //    )
-            //);
-
-            WriteXml(service, ident);
+                );
+            WriteXml(service, _ident);
         }
     }
 }

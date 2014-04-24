@@ -1,45 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ServiceModel;
-using Rust;
 using System.ServiceModel.Description;
-using System.ServiceModel.Security;
 using System.ServiceModel.Web;
+using Rust;
 
 namespace ConsoleHost
 {
-    class Program
+    internal class Program
     {
-
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            Uri baseAddress = new Uri("http://bmrfservers.com:8080/TestService");
+            var baseAddress = new Uri("http://bmrfservers.com:8080/Rustful");
             WebServiceHost serviceHost;
             //WSHttpBinding binding = new WSHttpBinding();
             //BasicHttpBinding binding = new BasicHttpBinding();
-            WebHttpBinding binding = new WebHttpBinding();
+            var binding = new WebHttpBinding();
 
             binding.Security.Mode = WebHttpSecurityMode.None;
-            serviceHost = new WebServiceHost(typeof(RustService), baseAddress);
+            serviceHost = new WebServiceHost(typeof (RustService), baseAddress);
 
             //serviceHost.Credentials.UserNameAuthentication.UserNamePasswordValidationMode = UserNamePasswordValidationMode.Custom;
             //serviceHost.Credentials.UserNameAuthentication.CustomUserNamePasswordValidator = new CredentialValidator();
             //binding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Basic;
 
-            ServiceEndpoint ep = serviceHost.AddServiceEndpoint(typeof(IRustService), binding, "RustServiceHost");
-
             //ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
-            WebHttpBehavior whb = new WebHttpBehavior();
-            ServiceDebugBehavior debug = serviceHost.Description.Behaviors.Find<ServiceDebugBehavior>();
+            var whb = new WebHttpBehavior();
+            var debug = serviceHost.Description.Behaviors.Find<ServiceDebugBehavior>();
 
             // if not found - add behavior with setting turned on 
             if (debug == null)
             {
                 serviceHost.Description.Behaviors.Add(
-                     new ServiceDebugBehavior() { IncludeExceptionDetailInFaults = true });
+                    new ServiceDebugBehavior {IncludeExceptionDetailInFaults = true});
             }
             else
             {

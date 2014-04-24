@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
-using System.Text;
 
-namespace Rust 
+namespace Rust
 {
     [ServiceContract]
-    public interface IRustService 
+    public interface IRustService
     {
         [OperationContract]
         [WebInvoke(Method = "GET",
@@ -79,7 +75,7 @@ namespace Rust
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "RunRconCommand?ident={ident}&cmd={cmd}")]
-        string RunRconCommand(string ident, string cmd);
+        Results RunRconCommand(string ident, string cmd);
 
         [OperationContract]
         [WebInvoke(Method = "GET",

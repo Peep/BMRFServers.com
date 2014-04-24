@@ -1,30 +1,23 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
-using System.ServiceModel;
-using Rust;
-using System.ServiceModel.Description;
 using System.Configuration.Install;
+using System.ServiceProcess;
 
-namespace RustServiceHost 
+namespace RustServiceHost
 {
-    static class Program 
+    internal static class Program
     {
-        static void Main(string[] args) 
+        private static void Main(string[] args)
         {
-            if (args.Length == 0) 
+            if (args.Length == 0)
             {
                 ServiceBase[] ServicesToRun;
-                ServicesToRun = new ServiceBase[] { new RustServiceHost() };
+                ServicesToRun = new ServiceBase[] {new RustServiceHost()};
                 ServiceBase.Run(ServicesToRun);
-            } 
-            else if (args.Length == 1) 
+            }
+            else if (args.Length == 1)
             {
-                switch (args[0]) 
+                switch (args[0])
                 {
                     case "-install":
                         InstallService();
@@ -40,15 +33,15 @@ namespace RustServiceHost
             }
         }
 
-        private static bool IsInstalled() 
+        private static bool IsInstalled()
         {
-            using (ServiceController controller = new ServiceController("Rust Service Host")) 
-                {
-                try 
+            using (var controller = new ServiceController("Rust Service Host"))
+            {
+                try
                 {
                     ServiceControllerStatus status = controller.Status;
-                } 
-                catch 
+                }
+                catch
                 {
                     return false;
                 }
@@ -56,9 +49,9 @@ namespace RustServiceHost
             }
         }
 
-        private static bool IsRunning() 
+        private static bool IsRunning()
         {
-            using (ServiceController controller = new ServiceController("Rust Service Host")) 
+            using (var controller = new ServiceController("Rust Service Host"))
             {
                 if (!IsInstalled())
                 {
@@ -68,120 +61,120 @@ namespace RustServiceHost
             }
         }
 
-        private static AssemblyInstaller GetInstaller() 
+        private static AssemblyInstaller GetInstaller()
         {
-            AssemblyInstaller installer = new AssemblyInstaller(typeof(RustServiceHost).Assembly, null);
+            var installer = new AssemblyInstaller(typeof (RustServiceHost).Assembly, null);
             installer.UseNewContext = true;
             return installer;
         }
 
-        private static void InstallService() 
+        private static void InstallService()
         {
             if (IsInstalled())
             {
                 return;
             }
 
-            try 
+            try
             {
-                using (AssemblyInstaller installer = GetInstaller()) 
+                using (AssemblyInstaller installer = GetInstaller())
                 {
                     IDictionary state = new Hashtable();
-                    try 
+                    try
                     {
                         installer.Install(state);
                         installer.Commit(state);
-                    } 
-                    catch 
+                    }
+                    catch
                     {
-                        try 
+                        try
                         {
                             installer.Rollback(state);
                         }
-                        catch 
+                        catch
                         {
-                            throw; 
+                            throw;
                         }
                     }
                 }
-            } 
-            catch 
+            }
+            catch
             {
                 throw;
             }
         }
 
-        private static void UninstallService() 
+        private static void UninstallService()
         {
             if (!IsInstalled())
             {
                 return;
             }
-            try 
+            try
             {
-                using (AssemblyInstaller installer = GetInstaller()) 
+                using (AssemblyInstaller installer = GetInstaller())
                 {
                     IDictionary state = new Hashtable();
-                    try 
+                    try
                     {
                         installer.Uninstall(state);
-                    } 
-                    catch 
+                    }
+                    catch
                     {
                         throw;
                     }
                 }
-            } 
-            catch 
+            }
+            catch
             {
                 throw;
             }
         }
 
-        private static void StartService() 
+        private static void StartService()
         {
             if (!IsInstalled())
             {
                 return;
             }
 
-            using (ServiceController controller = new ServiceController("Rust Service Host")) 
+            using (var controller = new ServiceController("Rust Service Host"))
             {
-                try 
+                try
                 {
-                    if (controller.Status != ServiceControllerStatus.Running) 
+                    if (controller.Status != ServiceControllerStatus.Running)
                     {
                         controller.Start();
                         controller.WaitForStatus(ServiceControllerStatus.Running,
                             TimeSpan.FromSeconds(10));
                     }
-                } 
-                catch 
+                }
+                catch
                 {
                     throw;
                 }
             }
         }
 
-        private static void StopService() 
+        private static void StopService()
         {
             if (!IsInstalled())
             {
                 return;
             }
 
-            using (ServiceController controller = new ServiceController("Rust Service Host")) 
+            using (var controller = new ServiceController("Rust Service Host"))
             {
-                try 
+                try
                 {
-                    if (controller.Status != ServiceControllerStatus.Stopped) 
+                    if (controller.Status != ServiceControllerStatus.Stopped)
                     {
                         controller.Stop();
                         controller.WaitForStatus(ServiceControllerStatus.Stopped,
-                             TimeSpan.FromSeconds(10));
+                            TimeSpan.FromSeconds(10));
                     }
-                } 
-                catch 
+                }
+                catch
                 {
                     throw;
                 }

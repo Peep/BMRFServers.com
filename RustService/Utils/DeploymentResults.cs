@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ServiceModel;
 
-namespace Rust 
+namespace Rust
 {
-    public class DeploymentResults 
+    public class DeploymentResults
     {
         public static string Identifier { get; set; }
 
@@ -17,7 +13,7 @@ namespace Rust
 
         public static bool FireDaemonSuccess { get; set; }
 
-        public static bool FtpSuccess {get; set; }
+        public static bool FtpSuccess { get; set; }
 
         public static bool ExceptionThrown { get; set; }
 
